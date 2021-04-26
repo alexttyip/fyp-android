@@ -1,51 +1,132 @@
-package com.ytt.vmv;
+package com.ytt.vmv
 
-import android.os.Bundle;
+import android.graphics.*
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Transformation
+import kotlin.math.min
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.view.View;
-
-import android.view.Menu;
-import android.view.MenuItem;
-
-public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+class MainActivity : AppCompatActivity(), View.OnClickListener {
+    private var selected = -1
+    private val data = Array(4) {
+        Candidate(
+                "$it",
+                "https://picsum.photos/id/${it * 10}/200"
+        )
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    private lateinit var linearLayout: LinearLayout
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        setContentView(R.layout.activity_main)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener { view: View? ->
+            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
         }
 
-        return super.onOptionsItemSelected(item);
+        linearLayout = findViewById(R.id.list_choices)
+
+        data.forEachIndexed { index, (name, picUrl) ->
+            val cardView = layoutInflater.inflate(R.layout.list_card_item, linearLayout, false) as ConstraintLayout
+
+            val textView = cardView.findViewById<TextView>(R.id.text1)
+            textView.text = name
+
+            if (selected == index) {
+                textView.setTextColor(Color.CYAN)
+            } else {
+                textView.setTextColor(Color.BLACK)
+            }
+
+            Picasso.get()
+                    .load(picUrl)
+                    .resize(60, 60)
+                    .centerCrop()
+                    .transform(CircleTransform())
+                    .into(cardView.findViewById<ImageView>(R.id.image_profile_pic))
+
+            cardView.setOnClickListener(this)
+
+            linearLayout.addView(cardView)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        return if (id == R.id.action_settings) {
+            true
+        } else super.onOptionsItemSelected(item)
+    }
+
+    private fun setCardColor(parent: LinearLayout, i: Int, color: Int) {
+        (parent.getChildAt(i) as ConstraintLayout).getChildAt(0)
+                .setBackgroundColor(color)
+    }
+
+    override fun onClick(v: View?) {
+        if (!this::linearLayout.isInitialized) return
+
+        val i = linearLayout.indexOfChild(v)
+
+        if (i == -1 || i == selected) return
+
+        if (selected != -1)
+            setCardColor(linearLayout, selected, Color.WHITE)
+
+        setCardColor(linearLayout, i, Color.CYAN)
+
+        selected = i
+    }
+}
+
+data class Candidate(val name: String, val picUrl: String)
+
+class CircleTransform : Transformation {
+    override fun transform(source: Bitmap): Bitmap {
+        val size = min(source.width, source.height)
+        val x = (source.width - size) / 2
+        val y = (source.height - size) / 2
+        val squaredBitmap = Bitmap.createBitmap(source, x, y, size, size)
+        if (squaredBitmap != source) {
+            source.recycle()
+        }
+        val bitmap = Bitmap.createBitmap(size, size, source.config)
+        val canvas = Canvas(bitmap)
+        val paint = Paint()
+        val shader = BitmapShader(squaredBitmap,
+                Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        paint.shader = shader
+        paint.isAntiAlias = true
+        val r = size / 2f
+        canvas.drawCircle(r, r, r, paint)
+        squaredBitmap.recycle()
+        return bitmap
+    }
+
+    override fun key(): String {
+        return "circle"
     }
 }
