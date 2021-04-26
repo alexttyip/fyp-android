@@ -17,13 +17,13 @@ import kotlin.math.min
 
 data class Candidate(val name: String, val picUrl: String)
 
-class FirstFragment : Fragment() {
+class VoteFragment : Fragment() {
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false)
+        return inflater.inflate(R.layout.fragment_vote, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
