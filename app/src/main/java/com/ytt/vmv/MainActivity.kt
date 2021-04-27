@@ -2,12 +2,12 @@ package com.ytt.vmv
 
 import android.graphics.*
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -37,9 +37,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setSupportActionBar(toolbar)
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener { view: View? ->
-            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        fab.setOnClickListener {
+            Log.e("FAB", "CLICKED!")
+            Log.e("Selected", "$selected")
+            if (selected != -1) {
+                AlertDialog.Builder(this)
+                        .setTitle("Confirm Vote")
+                        .setMessage("You voted for: ${data[selected].name}\n\nDo you wish to proceed?")
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            Snackbar.make(it!!, "You voted for ${data[selected].name}", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show()
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+            }
         }
 
         linearLayout = findViewById(R.id.list_choices)
@@ -56,6 +67,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 textView.setTextColor(Color.BLACK)
             }
 
+            Picasso.get().isLoggingEnabled = true
+
             Picasso.get()
                     .load(picUrl)
                     .resize(60, 60)
@@ -67,18 +80,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             linearLayout.addView(cardView)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        return if (id == R.id.action_settings) {
-            true
-        } else super.onOptionsItemSelected(item)
     }
 
     private fun setCardColor(parent: LinearLayout, i: Int, color: Int) {
