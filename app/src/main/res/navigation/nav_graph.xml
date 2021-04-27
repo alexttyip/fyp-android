@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/nav_graph">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/voteFragment">
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/VoteFragment"-->
-    <!--        android:name="com.ytt.vmv.VoteFragment"-->
-    <!--        android:label="@string/vote_fragment_label"-->
-    <!--        tools:layout="@layout/fragment_vote">-->
-
-    <!--        &lt;!&ndash;        <action&ndash;&gt;-->
-    <!--        &lt;!&ndash;            android:id="@+id/action_FirstFragment_to_SecondFragment"&ndash;&gt;-->
-    <!--        &lt;!&ndash;            app:destination="@id/SecondFragment" />&ndash;&gt;-->
-    <!--    </fragment>-->
+    <fragment
+        android:id="@+id/voteFragment"
+        android:name="com.ytt.vmv.VoteFragment"
+        android:label="@string/vote_fragment_label"
+        tools:layout="@layout/fragment_vote" />
 </navigation>
