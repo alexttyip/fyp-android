@@ -7,7 +7,7 @@
 
         <variable
             name="voteOptions"
-            type="java.util.List&lt;com.ytt.vmv.models.VoteOption>" />
+            type="com.ytt.vmv.models.VoteOptions" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,7 +33,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    app:voteOptions="@{voteOptions}" />
+                    app:voteOptions="@{voteOptions.voteOptions}" />
             </ScrollView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
