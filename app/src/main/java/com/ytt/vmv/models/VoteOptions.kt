@@ -1,16 +1,25 @@
 package com.ytt.vmv.models
 
+import android.app.Application
+import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
 import com.squareup.picasso.Picasso
 import com.ytt.vmv.CircleTransform
+import com.ytt.vmv.network.NetworkSingleton
+import org.json.JSONArray
+
+const val URL = "http://10.0.2.2:3000/vote-options"
 
 data class VoteOption(val name: String, val picUrl: String)
 
-class VoteOptions : ViewModel() {
+class VoteOptions(application: Application) : AndroidViewModel(application) {
     private val options: MutableLiveData<List<VoteOption>> by lazy {
         loadVoteOptions()
     }
@@ -19,13 +28,24 @@ class VoteOptions : ViewModel() {
         return options
     }
 
-    private fun loadVoteOptions(): MutableLiveData<List<VoteOption>> {
-        return MutableLiveData(List(4) {
+    private val handleResponse: Response.Listener<JSONArray> = Response.Listener { array ->
+        options.value = (0 until array.length()).map {
             VoteOption(
-                "$it",
+                array.getJSONObject(it).getString("option"),
                 "https://picsum.photos/id/${it * 10}/200"
             )
-        })
+        }
+    }
+
+    private fun loadVoteOptions(): MutableLiveData<List<VoteOption>> {
+        val jsonRequest = JsonArrayRequest(
+            Request.Method.GET, URL, null,
+            handleResponse,
+            { Log.e("Response", it.toString()) })
+
+        NetworkSingleton.getInstance(getApplication()).addToRequestQueue(jsonRequest)
+
+        return MutableLiveData(listOf())
     }
 }
 
