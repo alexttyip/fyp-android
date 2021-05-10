@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.VMV.NoActionBar">
+    <style name="Theme.VMV.NoActionBar" parent="Theme.VMV">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

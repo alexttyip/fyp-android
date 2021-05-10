@@ -24,6 +24,8 @@ const val VOTE_URL = "http://10.0.2.2:3000/vote"
 
 class VoteFragment : Fragment() {
 
+    // TODO private val args: VoteFragmentArgs by navArgs()
+
     private val model: VoteOptions by viewModels()
 
     private var selectedOption = -1

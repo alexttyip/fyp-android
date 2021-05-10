@@ -8,11 +8,17 @@
         <variable
             name="model"
             type="com.ytt.vmv.models.ElectionModel" />
+
+        <variable
+            name="itemClickListener"
+            type="com.ytt.vmv.fragments.ElectionItemClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="@{() -> itemClickListener.onItemClick(model)}"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 

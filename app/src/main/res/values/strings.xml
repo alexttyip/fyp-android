@@ -2,8 +2,7 @@
     <string name="app_name">VMV</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="main_fragment_label">Main Fragment</string>
-    <string name="vote_fragment_label">Vote Fragment</string>
+    <string name="main_fragment_label">Elections</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 

@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ytt.vmv.R
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListTwoLinesItemBinding
 import com.ytt.vmv.models.ElectionModel
@@ -18,11 +18,11 @@ import java.util.*
 private val mockData = List(10) {
     ElectionModel(
         "UK General Election 200$it",
-        Date()
+        Date().time
     )
 }
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), ElectionItemClickListener {
     private var fragmentMainBinding: FragmentMainBinding? = null
 
     override fun onCreateView(
@@ -33,16 +33,15 @@ class MainFragment : Fragment() {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
         fragmentMainBinding = binding
 
+        val myLayoutManager = LinearLayoutManager(context)
+        val decoration = DividerItemDecoration(context, myLayoutManager.orientation)
+
         binding.recycler.also {
-            it.adapter = ElectionAdapter(mockData)
-            it.layoutManager = LinearLayoutManager(context)
+            it.adapter = ElectionAdapter(mockData, this)
+            it.layoutManager = myLayoutManager
+            it.addItemDecoration(decoration)
         }
 
-        binding.fab.setOnClickListener {
-            Log.e("FAB", "Clicked")
-            findNavController()
-                .navigate(R.id.action_mainFragment_to_voteFragment)
-        }
         return binding.root
     }
 
@@ -51,14 +50,18 @@ class MainFragment : Fragment() {
         super.onDestroyView()
     }
 
-    class ElectionAdapter(private val data: List<ElectionModel>) :
+    class ElectionAdapter(
+        private val data: List<ElectionModel>,
+        private val itemClickListener: ElectionItemClickListener
+    ) :
         RecyclerView.Adapter<ElectionAdapter.MyViewHolder>() {
-        class MyViewHolder(val binding: ListTwoLinesItemBinding) :
+        class MyViewHolder(private val binding: ListTwoLinesItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(model: ElectionModel) {
+            fun bind(model: ElectionModel, itemClickListener: ElectionItemClickListener) {
                 Log.e("Bind", model.name)
                 binding.model = model
+                binding.itemClickListener = itemClickListener
                 binding.executePendingBindings()
             }
         }
@@ -72,9 +75,18 @@ class MainFragment : Fragment() {
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
             val election = data[position]
-            holder.bind(election)
+            holder.bind(election, itemClickListener)
         }
 
         override fun getItemCount() = data.size
     }
+
+    override fun onItemClick(model: ElectionModel) {
+        findNavController()
+            .navigate(MainFragmentDirections.actionMainFragmentToVoteFragment(model.name, model))
+    }
+}
+
+fun interface ElectionItemClickListener {
+    fun onItemClick(model: ElectionModel)
 }
