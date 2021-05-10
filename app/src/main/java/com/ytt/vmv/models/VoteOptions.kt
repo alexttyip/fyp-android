@@ -23,7 +23,6 @@ class VoteOptionModel(
     val selected: MutableLiveData<Boolean> = MutableLiveData(false)
 ) : ViewModel()
 
-
 class VoteOptions(application: Application) : AndroidViewModel(application) {
     val options: MutableLiveData<List<VoteOptionModel>> by lazy {
         loadVoteOptions()
