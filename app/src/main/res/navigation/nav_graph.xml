@@ -18,8 +18,12 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_mainFragment_to_generateKeyFragment"
-            app:destination="@id/generateKeyFragment" />
+            android:id="@+id/action_mainFragment_to_keyListFragment"
+            app:destination="@id/keyListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment
@@ -35,8 +39,8 @@
             app:argType="com.ytt.vmv.models.ElectionModel" />
     </fragment>
     <fragment
-        android:id="@+id/generateKeyFragment"
-        android:name="com.ytt.vmv.fragments.GenerateKeyFragment"
-        android:label="@string/generate_key_fragment_label"
-        tools:layout="@layout/fragment_generate_key" />
+        android:id="@+id/keyListFragment"
+        android:name="com.ytt.vmv.fragments.KeyListFragment"
+        android:label="@string/key_list_fragment_label"
+        tools:layout="@layout/fragment_key_list" />
 </navigation>

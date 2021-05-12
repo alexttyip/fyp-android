@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,9 +59,11 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             RecyclerView.ViewHolder(binding.root) {
 
             fun bind(model: ElectionModel, itemClickListener: ElectionItemClickListener) {
-                binding.model = model
-                binding.itemClickListener = itemClickListener
-                binding.executePendingBindings()
+                binding.line1.text = model.name
+                binding.line2.text = model.getDate()
+                binding.root.setOnClickListener {
+                    itemClickListener.onItemClick(model)
+                }
             }
         }
 
@@ -93,8 +94,15 @@ class MainFragment : Fragment(), ElectionItemClickListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return NavigationUI.onNavDestinationSelected(item, findNavController())
-                || super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_view_keys -> {
+                findNavController()
+                    .navigate(MainFragmentDirections.actionMainFragmentToKeyListFragment())
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

@@ -6,7 +6,6 @@ import org.bouncycastle.crypto.params.DSAKeyGenerationParameters
 import org.bouncycastle.crypto.params.DSAParameters
 import org.bouncycastle.crypto.params.DSAPrivateKeyParameters
 import org.bouncycastle.crypto.params.DSAPublicKeyParameters
-import java.math.BigInteger
 import java.security.SecureRandom
 
 /**
@@ -42,18 +41,3 @@ private fun createKeys(parameters: Parameters): KeyPair {
         (keyPair.public as DSAPublicKeyParameters).y
     )
 }
-
-data class KeyPair(
-    val privateKey: BigInteger,
-    val publicKey: BigInteger,
-)
-
-data class Parameters(
-//        var name: String,
-//        var numTellers: Int,
-//        var thresholdTellers: Int,
-    val g: BigInteger, // generator
-    val p: BigInteger, // prime
-    val q: BigInteger // prime factor of p-1
-)
-
