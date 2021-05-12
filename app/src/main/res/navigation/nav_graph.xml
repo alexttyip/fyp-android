@@ -36,7 +36,7 @@
             app:argType="string" />
         <argument
             android:name="election"
-            app:argType="com.ytt.vmv.models.ElectionModel" />
+            app:argType="com.ytt.vmv.database.entities.Election" />
     </fragment>
     <fragment
         android:id="@+id/keyListFragment"

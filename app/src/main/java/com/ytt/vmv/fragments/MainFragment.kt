@@ -1,27 +1,28 @@
 package com.ytt.vmv.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.ytt.vmv.R
+import com.ytt.vmv.VMVApplication
+import com.ytt.vmv.database.entities.Election
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListTwoLinesItemBinding
-import com.ytt.vmv.models.ElectionModel
-import java.util.*
-
-private val mockData = List(10) {
-    ElectionModel(
-        "UK General Election 200$it",
-        Date().time
-    )
-}
+import com.ytt.vmv.models.ElectionViewModel
+import com.ytt.vmv.models.ElectionViewModelFactory
+import java.math.BigInteger
+import kotlin.random.Random
 
 class MainFragment : Fragment(), ElectionItemClickListener {
     private var fragmentMainBinding: FragmentMainBinding? = null
+
+    private val electionViewModel: ElectionViewModel by viewModels {
+        ElectionViewModelFactory((requireActivity().application as VMVApplication).electionRepository)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,13 +32,31 @@ class MainFragment : Fragment(), ElectionItemClickListener {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
         fragmentMainBinding = binding
 
+        val adapter = ElectionListAdapter(this)
         val myLayoutManager = LinearLayoutManager(context)
         val decoration = DividerItemDecoration(context, myLayoutManager.orientation)
 
         binding.recycler.also {
-            it.adapter = ElectionAdapter(mockData, this)
+            it.adapter = adapter
             it.layoutManager = myLayoutManager
             it.addItemDecoration(decoration)
+        }
+
+        electionViewModel.allElections.observe(viewLifecycleOwner) { elections ->
+            elections?.let { adapter.submitList(it) }
+        }
+
+        binding.fab.apply {
+            setOnClickListener {
+                electionViewModel.insert(
+                    Election(
+                        "New election ${Random.nextInt(100)}", 0, 0,
+                        BigInteger("1"),
+                        BigInteger("2"),
+                        BigInteger("3"),
+                    )
+                )
+            }
         }
 
         setHasOptionsMenu(true)
@@ -50,41 +69,63 @@ class MainFragment : Fragment(), ElectionItemClickListener {
         super.onDestroyView()
     }
 
-    class ElectionAdapter(
-        private val data: List<ElectionModel>,
+    class ElectionListAdapter(
         private val itemClickListener: ElectionItemClickListener
     ) :
-        RecyclerView.Adapter<ElectionAdapter.MyViewHolder>() {
-        class MyViewHolder(private val binding: ListTwoLinesItemBinding) :
+        ListAdapter<Election, ElectionListAdapter.ElectionViewHolder>(ElectionsComparator()) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElectionViewHolder {
+            return ElectionViewHolder.create(parent)
+        }
+
+        override fun onBindViewHolder(holder: ElectionViewHolder, position: Int) {
+            holder.bind(getItem(position), itemClickListener)
+        }
+
+        class ElectionViewHolder(private val binding: ListTwoLinesItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(model: ElectionModel, itemClickListener: ElectionItemClickListener) {
-                binding.line1.text = model.name
-                binding.line2.text = model.getDate()
+            @SuppressLint("SetTextI18n")
+            fun bind(election: Election, itemClickListener: ElectionItemClickListener) {
+                binding.line1.text = election.name
+                binding.line2.text = election.q.toString()
                 binding.root.setOnClickListener {
-                    itemClickListener.onItemClick(model)
+                    itemClickListener.onItemClick(election)
+                }
+            }
+
+            companion object {
+                fun create(parent: ViewGroup): ElectionViewHolder {
+                    val binding =
+                        ListTwoLinesItemBinding.inflate(
+                            LayoutInflater.from(parent.context),
+                            parent,
+                            false
+                        )
+                    return ElectionViewHolder(binding)
                 }
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val binding = ListTwoLinesItemBinding.inflate(inflater, parent, false)
+        class ElectionsComparator : DiffUtil.ItemCallback<Election>() {
+            override fun areItemsTheSame(oldItem: Election, newItem: Election): Boolean {
+                return oldItem === newItem
+            }
 
-            return MyViewHolder(binding)
+            override fun areContentsTheSame(oldItem: Election, newItem: Election): Boolean {
+                return oldItem.name == newItem.name
+            }
         }
-
-        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            val election = data[position]
-            holder.bind(election, itemClickListener)
-        }
-
-        override fun getItemCount() = data.size
     }
 
-    override fun onItemClick(model: ElectionModel) {
+
+    override fun onItemClick(election: Election) {
         findNavController()
-            .navigate(MainFragmentDirections.actionMainFragmentToVoteFragment(model.name, model))
+            .navigate(
+                MainFragmentDirections.actionMainFragmentToVoteFragment(
+                    election.name,
+                    election
+                )
+            )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -108,5 +149,5 @@ class MainFragment : Fragment(), ElectionItemClickListener {
 }
 
 fun interface ElectionItemClickListener {
-    fun onItemClick(model: ElectionModel)
+    fun onItemClick(election: Election)
 }
