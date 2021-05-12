@@ -1,15 +1,14 @@
 package com.ytt.vmv.fragments
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ytt.vmv.R
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListTwoLinesItemBinding
 import com.ytt.vmv.models.ElectionModel
@@ -42,6 +41,8 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             it.addItemDecoration(decoration)
         }
 
+        setHasOptionsMenu(true)
+
         return binding.root
     }
 
@@ -59,7 +60,6 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             RecyclerView.ViewHolder(binding.root) {
 
             fun bind(model: ElectionModel, itemClickListener: ElectionItemClickListener) {
-                Log.e("Bind", model.name)
                 binding.model = model
                 binding.itemClickListener = itemClickListener
                 binding.executePendingBindings()
@@ -85,6 +85,18 @@ class MainFragment : Fragment(), ElectionItemClickListener {
         findNavController()
             .navigate(MainFragmentDirections.actionMainFragmentToVoteFragment(model.name, model))
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return NavigationUI.onNavDestinationSelected(item, findNavController())
+                || super.onOptionsItemSelected(item)
+    }
+
 }
 
 fun interface ElectionItemClickListener {

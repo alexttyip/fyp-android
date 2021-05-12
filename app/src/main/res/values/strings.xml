@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">VMV</string>
-    <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="main_fragment_label">Elections</string>
+    <string name="generate_key_fragment_label">Generate Key</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
     <string name="profile_pic_desc">profile pic</string>
+    <string name="action_generate_keys">Generate Key</string>
 </resources>
