@@ -20,7 +20,7 @@ const val URL = "http://10.0.2.2:3000/vote-options"
 class VoteOptionModel(
     val name: String,
     val picUrl: String,
-    val selected: MutableLiveData<Boolean> = MutableLiveData(false)
+    var cardBackgroundColor: MutableLiveData<Int> = MutableLiveData(-1)
 ) : ViewModel()
 
 class VoteOptions(application: Application) : AndroidViewModel(application) {

@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.volley.toolbox.StringRequest
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.R
@@ -29,13 +32,23 @@ class VoteFragment : Fragment() {
     private val model: VoteOptions by viewModels()
 
     private var selectedOption = -1
-    private val selectedLst = mutableListOf<MutableLiveData<Boolean>>()
+    private val colorsList = mutableListOf<MutableLiveData<Int>>()
+
+    private var defaultCardColor: Int = -1
+    private var selectedCardColor: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_vote, container, false)
+
+        defaultCardColor = CardView(requireContext()).cardBackgroundColor.defaultColor
+        selectedCardColor = MaterialColors.getColor(
+            requireContext(),
+            R.attr.colorSecondary,
+            ContextCompat.getColor(requireContext(), R.color.teal_200)
+        )
 
         val optionsObserver = Observer<List<VoteOptionModel>> { newList ->
             val parent = view.findViewById<LinearLayout>(R.id.linear)
@@ -44,13 +57,13 @@ class VoteFragment : Fragment() {
 
             newList.forEachIndexed { index, voteOption ->
                 val itemBinding = ListCardItemBinding.inflate(layoutInflater)
-                val selected = MutableLiveData(false)
+                val cardColor = MutableLiveData(defaultCardColor)
 
                 itemBinding.model =
                     VoteOptionModel(
                         voteOption.name,
                         voteOption.picUrl,
-                        selected
+                        cardColor,
                     )
 
                 itemBinding.card.setOnClickListener {
@@ -59,7 +72,7 @@ class VoteFragment : Fragment() {
 
                 itemBinding.lifecycleOwner = this
 
-                selectedLst.add(selected)
+                colorsList.add(cardColor)
                 parent.addView(itemBinding.root)
             }
         }
@@ -111,8 +124,9 @@ class VoteFragment : Fragment() {
 
     private fun handleOnClick(i: Int) {
         if (selectedOption != -1)
-            selectedLst[selectedOption].value = false
-        selectedLst[i].value = true
+            colorsList[selectedOption].value = defaultCardColor
+
+        colorsList[i].value = selectedCardColor
 
         selectedOption = i
     }
