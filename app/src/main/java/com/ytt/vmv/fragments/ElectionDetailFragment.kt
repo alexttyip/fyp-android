@@ -38,9 +38,7 @@ class ElectionDetailFragment : Fragment() {
                     findNavController().navigate(
                         ElectionDetailFragmentDirections.actionElectionDetailFragmentToGenerateKeyFragment(
                             election.name,
-                            election.g.toString(),
-                            election.p.toString(),
-                            election.q.toString(),
+                            election
                         )
                     )
                 }

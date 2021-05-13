@@ -1,10 +1,6 @@
-package com.ytt.vmv.database.dao
+package com.ytt.vmv.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import com.ytt.vmv.database.entities.Election
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,7 +12,10 @@ interface ElectionDao {
     suspend fun loadAllByIds(name: String): List<Election>
 
     @Insert
-    suspend fun insert(elections: Election)
+    suspend fun insert(election: Election)
+
+    @Update
+    suspend fun update(election: Election)
 
     @Delete
     suspend fun delete(election: Election)

@@ -2,7 +2,7 @@ package com.ytt.vmv
 
 import android.app.Application
 import com.ytt.vmv.database.AppDatabase
-import com.ytt.vmv.database.repos.ElectionRepository
+import com.ytt.vmv.database.ElectionRepository
 import com.ytt.vmv.network.NetworkSingleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob

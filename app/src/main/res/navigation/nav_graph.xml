@@ -39,7 +39,7 @@
             app:argType="string" />
         <argument
             android:name="election"
-            app:argType="com.ytt.vmv.database.entities.Election" />
+            app:argType="com.ytt.vmv.database.Election" />
     </fragment>
     <fragment
         android:id="@+id/keyListFragment"
@@ -56,7 +56,7 @@
             app:argType="string" />
         <argument
             android:name="election"
-            app:argType="com.ytt.vmv.database.entities.Election" />
+            app:argType="com.ytt.vmv.database.Election" />
         <action
             android:id="@+id/action_electionDetailFragment_to_generateKeyFragment"
             app:destination="@id/generateKeyFragment" />
@@ -64,18 +64,13 @@
     <fragment
         android:id="@+id/generateKeyFragment"
         android:name="com.ytt.vmv.fragments.GenerateKeyFragment"
-        android:label="GenerateKeyFragment">
+        android:label="GenerateKeyFragment"
+        tools:layout="@layout/fragment_generate_key">
         <argument
             android:name="label"
             app:argType="string" />
         <argument
-            android:name="g"
-            app:argType="string" />
-        <argument
-            android:name="p"
-            app:argType="string" />
-        <argument
-            android:name="q"
-            app:argType="string" />
+            android:name="election"
+            app:argType="com.ytt.vmv.database.Election" />
     </fragment>
 </navigation>

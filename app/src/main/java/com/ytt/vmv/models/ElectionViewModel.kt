@@ -1,8 +1,8 @@
 package com.ytt.vmv.models
 
 import androidx.lifecycle.*
-import com.ytt.vmv.database.entities.Election
-import com.ytt.vmv.database.repos.ElectionRepository
+import com.ytt.vmv.database.Election
+import com.ytt.vmv.database.ElectionRepository
 import kotlinx.coroutines.launch
 
 class ElectionViewModel(private val repository: ElectionRepository) : ViewModel() {
@@ -11,6 +11,10 @@ class ElectionViewModel(private val repository: ElectionRepository) : ViewModel(
 
     fun insert(election: Election) = viewModelScope.launch {
         repository.insert(election)
+    }
+
+    fun update(election: Election) = viewModelScope.launch {
+        repository.update(election)
     }
 }
 

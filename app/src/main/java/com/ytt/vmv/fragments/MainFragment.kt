@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.ytt.vmv.R
 import com.ytt.vmv.VMVApplication
-import com.ytt.vmv.database.entities.Election
+import com.ytt.vmv.database.Election
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListTwoLinesItemBinding
 import com.ytt.vmv.models.ElectionViewModel
@@ -53,10 +53,6 @@ class MainFragment : Fragment(), ElectionItemClickListener {
                         "New election ${Random.nextInt(100)}", 0, 0,
                         BigInteger("1"),
                         BigInteger("2"),
-                        BigInteger("3"),
-                        BigInteger("2"),
-                        BigInteger("1"),
-                        BigInteger("1"),
                         BigInteger("3"),
                     )
                 )
