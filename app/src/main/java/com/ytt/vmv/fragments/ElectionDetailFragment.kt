@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ytt.vmv.databinding.FragmentElectionDetailBinding
 
@@ -23,20 +24,26 @@ class ElectionDetailFragment : Fragment() {
 
         val election = args.election
 
-        Log.e("Election", election.toString())
-
         binding.model = election
 
         binding.btnViewKeys.also {
-            it.text =
-                if (election.hasGeneratedKeyPairs())
-                    "View Keys"
-                else
-                    "Generate Keys"
-
-            it.setOnClickListener {
-                // TODO
-                Log.e("View keys", "OK")
+            if (election.hasGeneratedKeyPairs()) {
+                it.text = "View Keys"
+                it.setOnClickListener {
+                    Log.e("View keys", "OK")
+                }
+            } else {
+                it.text = "Generate Keys"
+                it.setOnClickListener {
+                    findNavController().navigate(
+                        ElectionDetailFragmentDirections.actionElectionDetailFragmentToGenerateKeyFragment(
+                            election.name,
+                            election.g.toString(),
+                            election.p.toString(),
+                            election.q.toString(),
+                        )
+                    )
+                }
             }
         }
 
