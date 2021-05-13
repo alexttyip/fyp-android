@@ -24,6 +24,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_mainFragment_to_electionDetailFragment"
+            app:destination="@id/electionDetailFragment" />
     </fragment>
 
     <fragment
@@ -43,4 +46,16 @@
         android:name="com.ytt.vmv.fragments.KeyListFragment"
         android:label="@string/key_list_fragment_label"
         tools:layout="@layout/fragment_key_list" />
+    <fragment
+        android:id="@+id/electionDetailFragment"
+        android:name="com.ytt.vmv.fragments.ElectionDetailFragment"
+        android:label="{label}"
+        tools:layout="@layout/fragment_election_detail">
+        <argument
+            android:name="label"
+            app:argType="string" />
+        <argument
+            android:name="election"
+            app:argType="com.ytt.vmv.database.entities.Election" />
+    </fragment>
 </navigation>

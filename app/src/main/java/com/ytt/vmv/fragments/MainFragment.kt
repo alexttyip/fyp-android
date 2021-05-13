@@ -54,6 +54,10 @@ class MainFragment : Fragment(), ElectionItemClickListener {
                         BigInteger("1"),
                         BigInteger("2"),
                         BigInteger("3"),
+                        BigInteger("2"),
+                        BigInteger("1"),
+                        BigInteger("1"),
+                        BigInteger("3"),
                     )
                 )
             }
@@ -121,7 +125,7 @@ class MainFragment : Fragment(), ElectionItemClickListener {
     override fun onItemClick(election: Election) {
         findNavController()
             .navigate(
-                MainFragmentDirections.actionMainFragmentToVoteFragment(
+                MainFragmentDirections.actionMainFragmentToElectionDetailFragment(
                     election.name,
                     election
                 )

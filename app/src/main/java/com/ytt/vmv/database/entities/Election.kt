@@ -15,4 +15,14 @@ data class Election(
     val g: BigInteger, // generator
     val p: BigInteger, // prime
     val q: BigInteger, // prime factor of p-1
-) : Parcelable
+    var trapdoorPublicKey: BigInteger? = null,
+    var trapdoorPrivateKey: BigInteger? = null,
+    var signingPublicKey: BigInteger? = null,
+    var signingPrivateKey: BigInteger? = null,
+) : Parcelable {
+    fun hasGeneratedKeyPairs(): Boolean =
+        (trapdoorPublicKey != null)
+                && (trapdoorPrivateKey != null)
+                && (signingPublicKey != null)
+                && (signingPrivateKey != null)
+}
