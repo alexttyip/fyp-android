@@ -1,7 +1,13 @@
 package com.ytt.vmv
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.*
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.squareup.picasso.Transformation
+import java.math.BigInteger
 import kotlin.math.min
 
 class CircleTransform : Transformation {
@@ -31,4 +37,28 @@ class CircleTransform : Transformation {
     override fun key(): String {
         return "circle"
     }
+}
+
+fun showParamDialog(context: Context, paramName: String, param: BigInteger) {
+    AlertDialog.Builder(context)
+        .setTitle("Content of $paramName")
+        .setMessage(param.toString())
+        .setNeutralButton(
+            "Copy to Clipboard"
+        ) { _, _ ->
+            val clipboard =
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+            val clip = ClipData.newPlainText(paramName, param.toString())
+
+            clipboard.setPrimaryClip(clip)
+
+            Toast.makeText(
+                context,
+                "Parameter $paramName copied to clipboard",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        .setPositiveButton(android.R.string.ok, null)
+        .show()
 }

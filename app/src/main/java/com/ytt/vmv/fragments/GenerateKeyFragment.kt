@@ -1,15 +1,10 @@
 package com.ytt.vmv.fragments
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -22,6 +17,7 @@ import com.ytt.vmv.cryptography.VoterKeyGenerator
 import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
 import com.ytt.vmv.models.ElectionViewModel
 import com.ytt.vmv.models.ElectionViewModelFactory
+import com.ytt.vmv.showParamDialog
 import org.json.JSONObject
 
 
@@ -44,9 +40,9 @@ class GenerateKeyFragment : Fragment() {
         val election = args.election
         val (name, voterId, _, _, g, p, q) = election
 
-        binding.btnG.setOnClickListener { showParamDialog("g", g.toString()) }
-        binding.btnP.setOnClickListener { showParamDialog("p", p.toString()) }
-        binding.btnQ.setOnClickListener { showParamDialog("q", q.toString()) }
+        binding.btnG.setOnClickListener { showParamDialog(requireContext(), "param g", election.g) }
+        binding.btnP.setOnClickListener { showParamDialog(requireContext(), "param p", election.p) }
+        binding.btnQ.setOnClickListener { showParamDialog(requireContext(), "param q", election.q) }
 
         val overlay = binding.overlay
 
@@ -99,29 +95,5 @@ class GenerateKeyFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    private fun showParamDialog(paramName: String, param: String) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Content of param $paramName")
-            .setMessage(param)
-            .setNeutralButton(
-                "Copy to Clipboard"
-            ) { _, _ ->
-                val clipboard =
-                    requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-                val clip = ClipData.newPlainText(paramName, param)
-
-                clipboard.setPrimaryClip(clip)
-
-                Toast.makeText(
-                    requireContext(),
-                    "Parameter $paramName copied to clipboard",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
     }
 }

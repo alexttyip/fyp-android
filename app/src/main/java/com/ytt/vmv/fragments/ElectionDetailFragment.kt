@@ -30,6 +30,12 @@ class ElectionDetailFragment : Fragment() {
             if (election.hasGeneratedKeyPairs()) {
                 it.text = "View Keys"
                 it.setOnClickListener {
+                    findNavController().navigate(
+                        ElectionDetailFragmentDirections.actionElectionDetailFragmentToViewKeyFragment(
+                            election.name,
+                            election
+                        )
+                    )
                     Log.e("View keys", "OK")
                 }
             } else {

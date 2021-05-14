@@ -14,6 +14,11 @@ import java.security.spec.DSAParameterSpec
 
 class VoterKeyGenerator {
     companion object {
+        enum class PrivateKey {
+            SIGNATURE_PRIVATE_KEY,
+            TRAPDOOR_PRIVATE_KEY
+        }
+
         fun genAndStore(
             applicationContext: Context,
             electionName: String,
@@ -38,9 +43,9 @@ class VoterKeyGenerator {
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
 
-
             val sharedPrefsFile: String =
                 electionName + applicationContext.getString(R.string.preference_private_keys_suffix)
+
             val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
                 applicationContext,
                 sharedPrefsFile,
@@ -51,12 +56,12 @@ class VoterKeyGenerator {
 
             with(sharedPreferences.edit()) {
                 putString(
-                    applicationContext.getString(R.string.trapdoor_private_key),
+                    PrivateKey.TRAPDOOR_PRIVATE_KEY.name,
                     trapdoorPrivateKey.toString()
                 )
 
                 putString(
-                    applicationContext.getString(R.string.signing_private_key),
+                    PrivateKey.SIGNATURE_PRIVATE_KEY.name,
                     signingPrivateKey.toString()
                 )
 
@@ -82,6 +87,29 @@ class VoterKeyGenerator {
             val advancedKeyAlias = MasterKeys.getOrCreate(advancedSpec) */
 
             return PublicKeys(trapdoorPublicKey, signingPublicKey)
+        }
+
+        fun getPrivateKey(
+            applicationContext: Context,
+            electionName: String,
+            privateKey: PrivateKey,
+        ): BigInteger {
+            val mainKey = MasterKey.Builder(applicationContext)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            val sharedPrefsFile: String =
+                electionName + applicationContext.getString(R.string.preference_private_keys_suffix)
+
+            val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
+                applicationContext,
+                sharedPrefsFile,
+                mainKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+
+            return BigInteger(sharedPreferences.getString(privateKey.name, "-1")!!)
         }
     }
 }
