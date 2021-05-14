@@ -5,6 +5,17 @@ import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 @Parcelize
+data class PublicKeys(
+    val trapdoorPublicKey: BigInteger,
+    val signingPublicKey: BigInteger,
+) : Parcelable {
+    companion object {
+        fun fromKeys(keys: Keys) = PublicKeys(keys.trapdoorPublicKey, keys.signingPublicKey)
+    }
+}
+
+
+@Parcelize
 data class Keys(
     val trapdoorPrivateKey: BigInteger,
     val trapdoorPublicKey: BigInteger,

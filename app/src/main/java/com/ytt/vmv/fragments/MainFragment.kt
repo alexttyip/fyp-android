@@ -50,7 +50,7 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             setOnClickListener {
                 electionViewModel.insert(
                     Election(
-                        "New election ${Random.nextInt(100)}", 0, 0,
+                        "New election ${Random.nextInt(100)}", 0, 0, 1,
                         BigInteger("1"),
                         BigInteger("2"),
                         BigInteger("3"),

@@ -1,60 +1,87 @@
 package com.ytt.vmv.cryptography
 
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
-import org.bouncycastle.crypto.generators.DSAKeyPairGenerator
-import org.bouncycastle.crypto.params.DSAKeyGenerationParameters
-import org.bouncycastle.crypto.params.DSAParameters
-import org.bouncycastle.crypto.params.DSAPrivateKeyParameters
-import org.bouncycastle.crypto.params.DSAPublicKeyParameters
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.ytt.vmv.R
 import java.math.BigInteger
+import java.security.KeyPairGenerator
 import java.security.SecureRandom
+import java.security.interfaces.DSAPrivateKey
+import java.security.interfaces.DSAPublicKey
+import java.security.spec.DSAParameterSpec
 
 class VoterKeyGenerator {
     companion object {
-        /**
-         * Generates a voter's trapdoor and signing key pairs with election parameters [g], [p], and [q].
-         *
-         * Returns trapdoorPublic, trapdoorPrivate, signingPublic, and signingPrivate
-         */
-        fun generate(
+        fun genAndStore(
+            applicationContext: Context,
+            electionName: String,
             g: BigInteger,
             p: BigInteger,
             q: BigInteger
-        ): Keys {
-            // Create the voter's trapdoor and signature key pairs.
-            println("Create Voter Trapdoor Keys")
-            val trapdoor = createKeys(g, p, q)
+        ): PublicKeys {
+            val spec = DSAParameterSpec(p, q, g)
+            val generator = KeyPairGenerator.getInstance("DSA")
 
-            println("Create Voter Trapdoor Keys")
-            val signing = createKeys(g, p, q)
+            generator.initialize(spec, SecureRandom())
 
-            return Keys(
-                trapdoor.first, trapdoor.second, signing.first, signing.second
+            val trapdoor = generator.genKeyPair()
+            val signing = generator.genKeyPair()
+
+            val trapdoorPrivateKey = (trapdoor.private as DSAPrivateKey).x
+            val trapdoorPublicKey = (trapdoor.public as DSAPublicKey).y
+            val signingPrivateKey = (signing.private as DSAPrivateKey).x
+            val signingPublicKey = (signing.public as DSAPublicKey).y
+
+            val mainKey = MasterKey.Builder(applicationContext)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+
+            val sharedPrefsFile: String =
+                electionName + applicationContext.getString(R.string.preference_private_keys_suffix)
+            val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
+                applicationContext,
+                sharedPrefsFile,
+                mainKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-        }
 
-        /**
-         * Creates a DSA key pair with the provided parameters [g], [p], and [q].
-         */
-        private fun createKeys(
-            g: BigInteger,
-            p: BigInteger,
-            q: BigInteger
-        ): Pair<BigInteger, BigInteger> {
-            // Convert the DH parameters.
-            val dsaParameters = DSAParameters(p, q, g)
+            with(sharedPreferences.edit()) {
+                putString(
+                    applicationContext.getString(R.string.trapdoor_private_key),
+                    trapdoorPrivateKey.toString()
+                )
 
-            // Generate the key pair using the parameters.
-            val generator = DSAKeyPairGenerator()
-            generator.init(DSAKeyGenerationParameters(SecureRandom(), dsaParameters))
+                putString(
+                    applicationContext.getString(R.string.signing_private_key),
+                    signingPrivateKey.toString()
+                )
 
-            println("Generating DSA keys")
+                apply()
+            }
 
-            val keyPair: AsymmetricCipherKeyPair = generator.generateKeyPair()
-            return Pair(
-                (keyPair.private as DSAPrivateKeyParameters).x,
-                (keyPair.public as DSAPublicKeyParameters).y
-            )
+            /* https://developer.android.com/training/articles/keystore#UserAuthentication
+            val advancedSpec = KeyGenParameterSpec.Builder(
+                "master_key",
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            ).apply {
+                setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                setKeySize(256)
+                setUserAuthenticationRequired(true)
+                setUserAuthenticationValidityDurationSeconds(15) // must be larger than 0
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    setUnlockedDeviceRequired(true)
+                    setIsStrongBoxBacked(true)
+                }
+            }.build()
+
+            val advancedKeyAlias = MasterKeys.getOrCreate(advancedSpec) */
+
+            return PublicKeys(trapdoorPublicKey, signingPublicKey)
         }
     }
 }

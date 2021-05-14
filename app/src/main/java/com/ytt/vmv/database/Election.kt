@@ -10,6 +10,7 @@ import java.math.BigInteger
 @Entity
 data class Election(
     @PrimaryKey val name: String,
+    val voterId: Int,
     val numTellers: Int,
     val thresholdTellers: Int,
     val g: BigInteger, // generator

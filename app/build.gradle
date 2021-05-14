@@ -54,8 +54,9 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.0"
     implementation "androidx.room:room-ktx:2.3.0"
     implementation "androidx.room:room-runtime:2.3.0"
+    implementation "androidx.security:security-crypto:1.1.0-alpha03"
+    implementation "androidx.security:security-identity-credential:1.0.0-alpha02"
     implementation "com.squareup.picasso:picasso:2.8"
-    implementation "org.bouncycastle:bcprov-jdk15to18:1.68"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

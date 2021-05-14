@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +12,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.cryptography.VoterKeyGenerator
 import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
 import com.ytt.vmv.models.ElectionViewModel
 import com.ytt.vmv.models.ElectionViewModelFactory
-import kotlin.system.measureTimeMillis
+import org.json.JSONObject
 
+
+const val UPLOAD_KEYS_URL = "http://10.0.2.2:3000/uploadKeys"
 
 class GenerateKeyFragment : Fragment() {
     private val args: GenerateKeyFragmentArgs by navArgs()
@@ -35,7 +42,7 @@ class GenerateKeyFragment : Fragment() {
         val binding = FragmentGenerateKeyBinding.inflate(inflater, container, false)
 
         val election = args.election
-        val (_, _, _, g, p, q) = election
+        val (name, voterId, _, _, g, p, q) = election
 
         binding.btnG.setOnClickListener { showParamDialog("g", g.toString()) }
         binding.btnP.setOnClickListener { showParamDialog("p", p.toString()) }
@@ -44,25 +51,51 @@ class GenerateKeyFragment : Fragment() {
         val overlay = binding.overlay
 
         binding.btnGenKey.setOnClickListener {
-            val time = measureTimeMillis {
+            overlay.visibility = View.VISIBLE
 
-                overlay.visibility = View.VISIBLE
+            val (trapdoorPublic, signingPublic) = VoterKeyGenerator.genAndStore(
+                requireActivity().applicationContext, name, g, p, q
+            )
 
-                val (trapdoorPrivate, trapdoorPublic, signingPrivate, signingPublic)
-                        = VoterKeyGenerator.generate(g, p, q)
+            election.trapdoorPublicKey = trapdoorPublic
+            election.signingPublicKey = signingPublic
 
-                election.trapdoorPublicKey = trapdoorPublic
-                election.signingPublicKey = signingPublic
+            // Save public keys locally
+            electionViewModel.update(election)
 
-                // TODO securely save private keys
+            // Upload public keys to backend
+            val jsonObj = JSONObject()
+                .put("election", name)
+                .put("voterId", voterId)
+                .put("publicKeyTrapdoor", trapdoorPublic.toString())
+                .put("publicKeySignature", signingPublic.toString())
 
-                electionViewModel.update(election)
+            val req =
+                JsonObjectRequest(Request.Method.POST, UPLOAD_KEYS_URL, jsonObj, { response ->
+                    Log.e("Response", response.toString())
 
-                overlay.visibility = View.INVISIBLE
-            }
+                    overlay.visibility = View.INVISIBLE
 
-            Toast.makeText(requireContext(), "Key generation took $time ms", Toast.LENGTH_LONG)
-                .show()
+                    Snackbar.make(
+                        container!!,
+                        "Keys generated successfully",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+
+                    findNavController().navigateUp()
+                }, { error ->
+                    Log.e("Error", error.toString())
+
+                    Snackbar.make(
+                        container!!,
+                        "Server error",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+
+                    overlay.visibility = View.INVISIBLE
+                })
+
+            (requireActivity().application as VMVApplication).network.addToRequestQueue(req)
         }
 
         return binding.root
