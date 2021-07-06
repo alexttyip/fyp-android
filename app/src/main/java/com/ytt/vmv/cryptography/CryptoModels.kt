@@ -6,21 +6,21 @@ import java.math.BigInteger
 
 @Parcelize
 data class PublicKeys(
-    val trapdoorPublicKey: BigInteger,
-    val signingPublicKey: BigInteger,
-) : Parcelable {
+    val publicKeySignature: BigInteger,
+    val publicKeyTrapdoor: BigInteger,
+) : Parcelable
+/* {
     companion object {
-        fun fromKeys(keys: Keys) = PublicKeys(keys.trapdoorPublicKey, keys.signingPublicKey)
+        fun fromKeys(keys: Keys) = PublicKeys(keys.publicKeySignature, keys.publicKeyTrapdoor)
     }
-}
-
+} */
 
 @Parcelize
 data class Keys(
-    val trapdoorPrivateKey: BigInteger,
-    val trapdoorPublicKey: BigInteger,
-    val signingPrivateKey: BigInteger,
-    val signingPublicKey: BigInteger,
+    val privateKeySignature: BigInteger,
+    val publicKeySignature: BigInteger,
+    val privateKeyTrapdoor: BigInteger,
+    val publicKeyTrapdoor: BigInteger,
 ) : Parcelable
 
 @Parcelize

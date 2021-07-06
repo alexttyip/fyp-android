@@ -16,6 +16,10 @@ class ElectionViewModel(private val repository: ElectionRepository) : ViewModel(
     fun update(election: Election) = viewModelScope.launch {
         repository.update(election)
     }
+
+    fun updateFromRemote() = viewModelScope.launch {
+        repository.updateFromRemote()
+    }
 }
 
 class ElectionViewModelFactory(private val repository: ElectionRepository) :

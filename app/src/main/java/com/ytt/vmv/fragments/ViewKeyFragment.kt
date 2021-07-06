@@ -36,7 +36,7 @@ class ViewKeyFragment : Fragment() {
             showParamDialog(
                 requireContext(),
                 "signature public key",
-                election.signingPublicKey!!
+                election.publicKeySignature!!
             )
         }
         binding.btnTrapdoorPrivate.setOnClickListener {
@@ -50,7 +50,7 @@ class ViewKeyFragment : Fragment() {
             showParamDialog(
                 requireContext(),
                 "trapdoor public key",
-                election.trapdoorPublicKey!!
+                election.publicKeyTrapdoor!!
             )
         }
 

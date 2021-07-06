@@ -2,20 +2,19 @@ package com.ytt.vmv.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
-import com.ytt.vmv.R
 import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.databinding.FragmentMainBinding
-import com.ytt.vmv.databinding.ListTwoLinesItemBinding
+import com.ytt.vmv.databinding.ListOneLineItemBinding
 import com.ytt.vmv.models.ElectionViewModel
 import com.ytt.vmv.models.ElectionViewModelFactory
-import java.math.BigInteger
-import kotlin.random.Random
 
 class MainFragment : Fragment(), ElectionItemClickListener {
     private var fragmentMainBinding: FragmentMainBinding? = null
@@ -46,20 +45,13 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             elections?.let { adapter.submitList(it) }
         }
 
-        binding.fab.apply {
-            setOnClickListener {
-                electionViewModel.insert(
-                    Election(
-                        "New election ${Random.nextInt(100)}", 0, 0, 1,
-                        BigInteger("1"),
-                        BigInteger("2"),
-                        BigInteger("3"),
-                    )
-                )
+        binding.swipe.setOnRefreshListener {
+            electionViewModel.updateFromRemote().invokeOnCompletion {
+                binding.swipe.isRefreshing = false
             }
         }
 
-        setHasOptionsMenu(true)
+//        setHasOptionsMenu(true)
 
         return binding.root
     }
@@ -81,13 +73,13 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             holder.bind(getItem(position), itemClickListener)
         }
 
-        class ElectionViewHolder(private val binding: ListTwoLinesItemBinding) :
+        class ElectionViewHolder(private val binding: ListOneLineItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
             @SuppressLint("SetTextI18n")
             fun bind(election: Election, itemClickListener: ElectionItemClickListener) {
                 binding.line1.text = election.name
-                binding.line2.text = election.q.toString()
+//                binding.line2.text = election.q.toString()
                 binding.root.setOnClickListener {
                     itemClickListener.onItemClick(election)
                 }
@@ -96,7 +88,7 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             companion object {
                 fun create(parent: ViewGroup): ElectionViewHolder {
                     val binding =
-                        ListTwoLinesItemBinding.inflate(
+                        ListOneLineItemBinding.inflate(
                             LayoutInflater.from(parent.context),
                             parent,
                             false
@@ -127,25 +119,6 @@ class MainFragment : Fragment(), ElectionItemClickListener {
                 )
             )
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_main, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_view_keys -> {
-                findNavController()
-                    .navigate(MainFragmentDirections.actionMainFragmentToKeyListFragment())
-
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
 }
 
 fun interface ElectionItemClickListener {

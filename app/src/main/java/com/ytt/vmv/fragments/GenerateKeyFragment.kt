@@ -21,7 +21,7 @@ import com.ytt.vmv.showParamDialog
 import org.json.JSONObject
 
 
-const val UPLOAD_KEYS_URL = "http://10.0.2.2:3000/uploadKeys"
+const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
 
 class GenerateKeyFragment : Fragment() {
     private val args: GenerateKeyFragmentArgs by navArgs()
@@ -49,23 +49,24 @@ class GenerateKeyFragment : Fragment() {
         binding.btnGenKey.setOnClickListener {
             overlay.visibility = View.VISIBLE
 
-            val (trapdoorPublic, signingPublic) = VoterKeyGenerator.genAndStore(
+            val (signingPublic, trapdoorPublic) = VoterKeyGenerator.genAndStore(
                 requireActivity().applicationContext, name, g, p, q
             )
 
-            election.trapdoorPublicKey = trapdoorPublic
-            election.signingPublicKey = signingPublic
+            election.publicKeySignature = signingPublic
+            election.publicKeyTrapdoor = trapdoorPublic
 
             // Save public keys locally
             electionViewModel.update(election)
 
             // Upload public keys to backend
             val jsonObj = JSONObject()
-                .put("election", name)
+                .put("electionName", name)
                 .put("voterId", voterId)
-                .put("publicKeyTrapdoor", trapdoorPublic.toString())
                 .put("publicKeySignature", signingPublic.toString())
+                .put("publicKeyTrapdoor", trapdoorPublic.toString())
 
+            // TODO test
             val req =
                 JsonObjectRequest(Request.Method.POST, UPLOAD_KEYS_URL, jsonObj, { response ->
                     Log.e("Response", response.toString())

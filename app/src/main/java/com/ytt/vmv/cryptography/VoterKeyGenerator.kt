@@ -31,13 +31,13 @@ class VoterKeyGenerator {
 
             generator.initialize(spec, SecureRandom())
 
-            val trapdoor = generator.genKeyPair()
             val signing = generator.genKeyPair()
+            val trapdoor = generator.genKeyPair()
 
-            val trapdoorPrivateKey = (trapdoor.private as DSAPrivateKey).x
-            val trapdoorPublicKey = (trapdoor.public as DSAPublicKey).y
-            val signingPrivateKey = (signing.private as DSAPrivateKey).x
-            val signingPublicKey = (signing.public as DSAPublicKey).y
+            val privateKeySignature = (signing.private as DSAPrivateKey).x
+            val publicKeySignature = (signing.public as DSAPublicKey).y
+            val privateKeyTrapdoor = (trapdoor.private as DSAPrivateKey).x
+            val publicKeyTrapdoor = (trapdoor.public as DSAPublicKey).y
 
             val mainKey = MasterKey.Builder(applicationContext)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -56,13 +56,13 @@ class VoterKeyGenerator {
 
             with(sharedPreferences.edit()) {
                 putString(
-                    PrivateKey.TRAPDOOR_PRIVATE_KEY.name,
-                    trapdoorPrivateKey.toString()
+                    PrivateKey.SIGNATURE_PRIVATE_KEY.name,
+                    privateKeySignature.toString()
                 )
 
                 putString(
-                    PrivateKey.SIGNATURE_PRIVATE_KEY.name,
-                    signingPrivateKey.toString()
+                    PrivateKey.TRAPDOOR_PRIVATE_KEY.name,
+                    privateKeyTrapdoor.toString()
                 )
 
                 apply()
@@ -86,7 +86,7 @@ class VoterKeyGenerator {
 
             val advancedKeyAlias = MasterKeys.getOrCreate(advancedSpec) */
 
-            return PublicKeys(trapdoorPublicKey, signingPublicKey)
+            return PublicKeys(publicKeySignature, publicKeyTrapdoor)
         }
 
         fun getPrivateKey(
