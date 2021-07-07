@@ -28,6 +28,8 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         suspend fun populateDatabase(electionDao: ElectionDao) {
+            if (electionDao.count() > 0) return
+
             // Delete all content here.
             electionDao.deleteAll()
 
@@ -67,20 +69,20 @@ abstract class AppDatabase : RoomDatabase() {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
-                /* val instance = Room.databaseBuilder(
+                /* val instance = Room.inMemoryDatabaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                ) */
+
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "vmv_database"
-                ) */
-
-                val instance = Room.inMemoryDatabaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
                 )
                     .addCallback(AppDatabaseCallback(scope))
                     .build()
+
                 INSTANCE = instance
-                // return instance
                 instance
             }
         }

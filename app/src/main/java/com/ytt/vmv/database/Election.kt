@@ -24,6 +24,7 @@ data class Election(
     fun hasGeneratedKeyPairs() = (publicKeySignature != null) && (publicKeyTrapdoor != null)
 }
 
+@Parcelize
 @Entity
 data class ElectionOption(
     val option: String,
@@ -31,8 +32,9 @@ data class ElectionOption(
     val electionName: String,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-)
+) : Parcelable
 
+@Parcelize
 data class ElectionAndOptions(
     @Embedded val election: Election,
     @Relation(
@@ -40,4 +42,4 @@ data class ElectionAndOptions(
         entityColumn = "electionName"
     )
     val options: List<ElectionOption>
-)
+) : Parcelable

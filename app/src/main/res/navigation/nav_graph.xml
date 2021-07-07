@@ -11,19 +11,8 @@
         android:label="@string/main_fragment_label"
         tools:layout="@layout/fragment_main">
         <action
-            android:id="@+id/action_mainFragment_to_voteFragment"
-            app:destination="@id/voteFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_mainFragment_to_keyListFragment"
-            app:destination="@id/keyListFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:destination="@id/keyListFragment" />
         <action
             android:id="@+id/action_mainFragment_to_electionDetailFragment"
             app:destination="@id/electionDetailFragment" />
@@ -38,8 +27,8 @@
             android:name="label"
             app:argType="string" />
         <argument
-            android:name="election"
-            app:argType="com.ytt.vmv.database.Election" />
+            android:name="electionAndOptions"
+            app:argType="com.ytt.vmv.database.ElectionAndOptions" />
     </fragment>
     <fragment
         android:id="@+id/keyListFragment"
@@ -55,14 +44,17 @@
             android:name="label"
             app:argType="string" />
         <argument
-            android:name="election"
-            app:argType="com.ytt.vmv.database.Election" />
+            android:name="electionAndOptions"
+            app:argType="com.ytt.vmv.database.ElectionAndOptions" />
         <action
             android:id="@+id/action_electionDetailFragment_to_generateKeyFragment"
             app:destination="@id/generateKeyFragment" />
         <action
             android:id="@+id/action_electionDetailFragment_to_viewKeyFragment"
             app:destination="@id/viewKeyFragment" />
+        <action
+            android:id="@+id/action_electionDetailFragment_to_voteFragment"
+            app:destination="@id/voteFragment" />
     </fragment>
     <fragment
         android:id="@+id/generateKeyFragment"

@@ -5,12 +5,15 @@ import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ElectionViewModel(private val repository: ElectionRepository) : ViewModel() {
 
     val allElections: LiveData<List<Election>> = repository.allElections.asLiveData()
 
-    fun getByName(name: String) = repository.getByName(name).asLiveData()
+    fun getByName(name: String) = runBlocking {
+        repository.getByName(name)
+    }
 
     fun insert(election: Election) = viewModelScope.launch {
         repository.insert(election)

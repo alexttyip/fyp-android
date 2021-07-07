@@ -22,7 +22,7 @@ class ElectionDetailFragment : Fragment() {
         val binding = FragmentElectionDetailBinding.inflate(inflater, container, false)
         electionDetailBinding = binding
 
-        val election = args.election
+        val election = args.electionAndOptions.election
 
         binding.model = election
 
@@ -55,7 +55,12 @@ class ElectionDetailFragment : Fragment() {
             it.isEnabled = election.hasGeneratedKeyPairs()
 
             it.setOnClickListener {
-                Log.e("Vote", "OK")
+                findNavController().navigate(
+                    ElectionDetailFragmentDirections.actionElectionDetailFragmentToVoteFragment(
+                        election.name,
+                        args.electionAndOptions
+                    )
+                )
             }
         }
 

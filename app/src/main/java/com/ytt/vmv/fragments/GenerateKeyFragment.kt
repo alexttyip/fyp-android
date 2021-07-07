@@ -19,7 +19,6 @@ import com.ytt.vmv.models.ElectionViewModelFactory
 import com.ytt.vmv.showParamDialog
 import org.json.JSONObject
 
-
 const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
 
 class GenerateKeyFragment : Fragment() {
