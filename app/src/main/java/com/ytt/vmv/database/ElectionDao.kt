@@ -8,11 +8,15 @@ interface ElectionDao {
     @Query("SELECT * FROM election")
     fun getAll(): Flow<List<Election>>
 
+    @Transaction
     @Query("SELECT * FROM election WHERE name = :name")
-    suspend fun loadAllByIds(name: String): List<Election>
+    fun getElectionAndOptionsByName(name: String): Flow<List<ElectionAndOptions>>
 
     @Insert
     suspend fun insert(election: Election)
+
+    @Insert
+    suspend fun insert(electionOption: ElectionOption)
 
     @Update
     suspend fun update(election: Election)

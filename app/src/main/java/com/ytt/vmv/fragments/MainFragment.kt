@@ -18,6 +18,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.database.Election
+import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListOneLineItemBinding
 import com.ytt.vmv.models.ElectionViewModel
@@ -118,6 +119,22 @@ class MainFragment : Fragment(), ElectionItemClickListener {
         )
 
         electionViewModel.insert(election)
+
+        val optionsJson = params.getJSONArray("voteOptions")
+        (0 until optionsJson.length()).forEach { i ->
+            val obj = optionsJson.getJSONObject(i)
+
+            val option = obj.getString("option")
+            val optionNumberInGroup = obj.getString("optionNumberInGroup")
+
+            electionViewModel.insert(
+                ElectionOption(
+                    option,
+                    BigInteger(optionNumberInGroup),
+                    name
+                )
+            )
+        }
     }
 
     class ElectionListAdapter(

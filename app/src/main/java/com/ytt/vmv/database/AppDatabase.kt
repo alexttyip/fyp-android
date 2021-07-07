@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.math.BigInteger
 
-@Database(entities = [Election::class], version = 1)
+@Database(entities = [Election::class, ElectionOption::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun electionDao(): ElectionDao
@@ -31,12 +31,10 @@ abstract class AppDatabase : RoomDatabase() {
             // Delete all content here.
             electionDao.deleteAll()
 
-            val names = listOf("Pets", "Colours", "Fruits")
-
-            repeat(3) {
+            listOf("Pets", "Colours", "Fruits").forEach {
                 electionDao.insert(
                     Election(
-                        names[it],
+                        it,
                         1,
                         4,
                         3,

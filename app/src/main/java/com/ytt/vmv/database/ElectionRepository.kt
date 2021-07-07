@@ -8,9 +8,16 @@ class ElectionRepository(private val electionDao: ElectionDao) {
 
     val allElections: Flow<List<Election>> = electionDao.getAll()
 
+    fun getByName(name: String) = electionDao.getElectionAndOptionsByName(name)
+
     @WorkerThread
     suspend fun insert(election: Election) {
         electionDao.insert(election)
+    }
+
+    @WorkerThread
+    suspend fun insert(electionOption: ElectionOption) {
+        electionDao.insert(electionOption)
     }
 
     @WorkerThread

@@ -1,8 +1,10 @@
 package com.ytt.vmv.database
 
 import android.os.Parcelable
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
@@ -21,3 +23,21 @@ data class Election(
 ) : Parcelable {
     fun hasGeneratedKeyPairs() = (publicKeySignature != null) && (publicKeyTrapdoor != null)
 }
+
+@Entity
+data class ElectionOption(
+    val option: String,
+    val optionNumberInGroup: BigInteger,
+    val electionName: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+)
+
+data class ElectionAndOptions(
+    @Embedded val election: Election,
+    @Relation(
+        parentColumn = "name",
+        entityColumn = "electionName"
+    )
+    val options: List<ElectionOption>
+)

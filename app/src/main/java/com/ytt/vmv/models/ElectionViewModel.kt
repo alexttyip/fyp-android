@@ -2,6 +2,7 @@ package com.ytt.vmv.models
 
 import androidx.lifecycle.*
 import com.ytt.vmv.database.Election
+import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
 import kotlinx.coroutines.launch
 
@@ -9,8 +10,14 @@ class ElectionViewModel(private val repository: ElectionRepository) : ViewModel(
 
     val allElections: LiveData<List<Election>> = repository.allElections.asLiveData()
 
+    fun getByName(name: String) = repository.getByName(name).asLiveData()
+
     fun insert(election: Election) = viewModelScope.launch {
         repository.insert(election)
+    }
+
+    fun insert(electionOption: ElectionOption) = viewModelScope.launch {
+        repository.insert(electionOption)
     }
 
     fun update(election: Election) = viewModelScope.launch {
