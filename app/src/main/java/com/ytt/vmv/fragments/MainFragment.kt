@@ -2,19 +2,31 @@ package com.ytt.vmv.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListOneLineItemBinding
 import com.ytt.vmv.models.ElectionViewModel
 import com.ytt.vmv.models.ElectionViewModelFactory
+import com.ytt.vmv.network.NetworkSingleton
+import org.json.JSONObject
+import java.math.BigInteger
+
+const val PARAMS_URL = "https://snapfile.tech/voter/getElectionParams"
 
 class MainFragment : Fragment(), ElectionItemClickListener {
     private var fragmentMainBinding: FragmentMainBinding? = null
@@ -51,7 +63,39 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             }
         }
 
-//        setHasOptionsMenu(true)
+        binding.fab.setOnClickListener {
+            val editText = EditText(requireContext())
+            editText.inputType = InputType.TYPE_CLASS_TEXT
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Join Election")
+                .setView(editText)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val input = editText.text.toString().trim()
+                    Log.e("Input", input)
+
+                    val req = JsonObjectRequest(
+                        Request.Method.GET,
+                        "$PARAMS_URL/${input}",
+                        null,
+                        { response ->
+                            Log.e("Response", response.toString())
+
+                            saveElectionParams(input, response)
+
+                            Snackbar.make(
+                                it,
+                                "Election $input added",
+                                Snackbar.LENGTH_LONG
+                            ).setAction("Action", null).show()
+                        },
+                        { error -> Log.e("Error", error.toString()) })
+
+                    NetworkSingleton.getInstance(requireContext()).addToRequestQueue(req)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
 
         return binding.root
     }
@@ -59,6 +103,21 @@ class MainFragment : Fragment(), ElectionItemClickListener {
     override fun onDestroyView() {
         fragmentMainBinding = null
         super.onDestroyView()
+    }
+
+    private fun saveElectionParams(name: String, params: JSONObject) {
+        // TODO voterId, numTellers, thresholdTellers
+        val election = Election(
+            name,
+            1,
+            4,
+            3,
+            BigInteger(params.getString("g")),
+            BigInteger(params.getString("p")),
+            BigInteger(params.getString("q")),
+        )
+
+        electionViewModel.insert(election)
     }
 
     class ElectionListAdapter(
@@ -108,7 +167,6 @@ class MainFragment : Fragment(), ElectionItemClickListener {
             }
         }
     }
-
 
     override fun onItemClick(election: Election) {
         findNavController()
