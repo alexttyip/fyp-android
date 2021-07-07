@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.ytt.vmv.cryptography.VoterKeyGenerator
-import com.ytt.vmv.cryptography.VoterKeyGenerator.Companion.getPrivateKey
 import com.ytt.vmv.databinding.FragmentViewKeyBinding
 import com.ytt.vmv.showParamDialog
 
@@ -26,10 +25,11 @@ class ViewKeyFragment : Fragment() {
         binding.btnP.setOnClickListener { showParamDialog(requireContext(), "param p", election.p) }
         binding.btnQ.setOnClickListener { showParamDialog(requireContext(), "param q", election.q) }
         binding.btnSignaturePrivate.setOnClickListener {
-            val signaturePrivateKey = getPrivateKey(
-                requireActivity().applicationContext, election.name,
-                VoterKeyGenerator.Companion.PrivateKey.SIGNATURE_PRIVATE_KEY
-            )
+            val signaturePrivateKey =
+                VoterKeyGenerator.getPrivateKey(
+                    requireActivity().applicationContext, election.name,
+                    VoterKeyGenerator.PrivateKey.SIGNATURE_PRIVATE_KEY
+                )
             showParamDialog(requireContext(), "signature private key", signaturePrivateKey)
         }
         binding.btnSignaturePublic.setOnClickListener {
@@ -40,9 +40,9 @@ class ViewKeyFragment : Fragment() {
             )
         }
         binding.btnTrapdoorPrivate.setOnClickListener {
-            val trapdoorPrivateKey = getPrivateKey(
+            val trapdoorPrivateKey = VoterKeyGenerator.getPrivateKey(
                 requireActivity().applicationContext, election.name,
-                VoterKeyGenerator.Companion.PrivateKey.TRAPDOOR_PRIVATE_KEY
+                VoterKeyGenerator.PrivateKey.SIGNATURE_PRIVATE_KEY
             )
             showParamDialog(requireContext(), "trapdoor private key", trapdoorPrivateKey)
         }

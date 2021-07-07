@@ -9,8 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.cryptography.VoterKeyGenerator
@@ -60,15 +59,8 @@ class GenerateKeyFragment : Fragment() {
             electionViewModel.update(election)
 
             // Upload public keys to backend
-            val jsonObj = JSONObject()
-                .put("electionName", name)
-                .put("voterId", voterId)
-                .put("publicKeySignature", signingPublic.toString())
-                .put("publicKeyTrapdoor", trapdoorPublic.toString())
-
-            // TODO test
             val req =
-                JsonObjectRequest(Request.Method.POST, UPLOAD_KEYS_URL, jsonObj, { response ->
+                object : StringRequest(Method.POST, UPLOAD_KEYS_URL, { response ->
                     Log.e("Response", response.toString())
 
                     overlay.visibility = View.INVISIBLE
@@ -90,7 +82,19 @@ class GenerateKeyFragment : Fragment() {
                     ).show()
 
                     overlay.visibility = View.INVISIBLE
-                })
+                }) {
+                    override fun getBody(): ByteArray {
+                        val jsonObj = JSONObject()
+                            .put("electionName", name)
+                            .put("voterId", voterId)
+                            .put("publicKeySignature", signingPublic.toString())
+                            .put("publicKeyTrapdoor", trapdoorPublic.toString())
+
+                        return jsonObj.toString().toByteArray()
+                    }
+
+                    override fun getBodyContentType() = "application/json; charset=utf-8"
+                }
 
             (requireActivity().application as VMVApplication).network.addToRequestQueue(req)
         }

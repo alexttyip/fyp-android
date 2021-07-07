@@ -13,12 +13,12 @@ import java.security.interfaces.DSAPublicKey
 import java.security.spec.DSAParameterSpec
 
 class VoterKeyGenerator {
-    companion object {
-        enum class PrivateKey {
-            SIGNATURE_PRIVATE_KEY,
-            TRAPDOOR_PRIVATE_KEY
-        }
+    enum class PrivateKey {
+        SIGNATURE_PRIVATE_KEY,
+        TRAPDOOR_PRIVATE_KEY
+    }
 
+    companion object {
         fun genAndStore(
             applicationContext: Context,
             electionName: String,
