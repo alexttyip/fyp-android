@@ -1,58 +1,57 @@
 package com.ytt.vmv.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.ytt.vmv.database.Election
 import com.ytt.vmv.databinding.FragmentElectionDetailBinding
+import com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback
+import dagger.hilt.android.AndroidEntryPoint
 
-class ElectionDetailFragment : Fragment() {
-    private var electionDetailBinding: FragmentElectionDetailBinding? = null
+@AndroidEntryPoint
+class ElectionDetailFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val args: ElectionDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentElectionDetailBinding.inflate(inflater, container, false)
-        electionDetailBinding = binding
 
-        val election = args.electionAndOptions.election
+        val electionAndOptions = args.electionAndOptions
+        val (election) = electionAndOptions
 
-        binding.model = election
+        binding.apply {
+            swipeRefresh.setOnRefreshListener(this@ElectionDetailFragment)
 
-        binding.btnViewKeys.also {
-            if (election.hasGeneratedKeyPairs()) {
-                it.text = "View Keys"
-                it.setOnClickListener {
-                    findNavController().navigate(
+            model = election
+
+            viewKeysCallback = ViewKeysCallback {
+                findNavController().navigate(
+                    if (it.hasGeneratedKeyPairs())
                         ElectionDetailFragmentDirections.actionElectionDetailFragmentToViewKeyFragment(
                             election.name,
-                            election
+//                            election
                         )
-                    )
-                    Log.e("View keys", "OK")
-                }
-            } else {
-                it.text = "Generate Keys"
-                it.setOnClickListener {
-                    findNavController().navigate(
+                    else
                         ElectionDetailFragmentDirections.actionElectionDetailFragmentToGenerateKeyFragment(
                             election.name,
                             election
                         )
-                    )
-                }
+                )
             }
         }
 
+        // TODO
         binding.btnVote.also {
-            it.isEnabled = election.hasGeneratedKeyPairs()
+            it.isEnabled =
+                election.hasGeneratedKeyPairs() && electionAndOptions.hasElectionStarted()
 
             it.setOnClickListener {
                 findNavController().navigate(
@@ -65,5 +64,12 @@ class ElectionDetailFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onRefresh() {
+    }
+
+    fun interface ViewKeysCallback {
+        fun view(election: Election)
     }
 }

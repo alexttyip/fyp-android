@@ -71,13 +71,10 @@
     <fragment
         android:id="@+id/viewKeyFragment"
         android:name="com.ytt.vmv.fragments.ViewKeyFragment"
-        android:label="{label}"
+        android:label="{election}"
         tools:layout="@layout/fragment_view_key">
         <argument
-            android:name="label"
-            app:argType="string" />
-        <argument
             android:name="election"
-            app:argType="com.ytt.vmv.database.Election" />
+            app:argType="string" />
     </fragment>
 </navigation>

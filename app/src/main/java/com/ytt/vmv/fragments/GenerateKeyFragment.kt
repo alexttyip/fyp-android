@@ -15,28 +15,27 @@ import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.cryptography.VoterKeyGenerator
 import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
 import com.ytt.vmv.models.ElectionViewModel
-import com.ytt.vmv.models.ElectionViewModelFactory
 import com.ytt.vmv.showParamDialog
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 
 const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
 
+@AndroidEntryPoint
 class GenerateKeyFragment : Fragment() {
     private val args: GenerateKeyFragmentArgs by navArgs()
 
-    private val electionViewModel: ElectionViewModel by viewModels {
-        ElectionViewModelFactory((requireActivity().application as VMVApplication).electionRepository)
-    }
+    private val electionViewModel: ElectionViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentGenerateKeyBinding.inflate(inflater, container, false)
 
         val election = args.election
-        val (name, voterId, _, _, g, p, q) = election
+        val (name, _, _, g, p, q) = election
 
         binding.btnG.setOnClickListener { showParamDialog(requireContext(), "param g", election.g) }
         binding.btnP.setOnClickListener { showParamDialog(requireContext(), "param p", election.p) }
@@ -85,7 +84,7 @@ class GenerateKeyFragment : Fragment() {
                     override fun getBody(): ByteArray {
                         val jsonObj = JSONObject()
                             .put("electionName", name)
-                            .put("voterId", voterId)
+                            .put("deviceId", election.deviceId)
                             .put("publicKeySignature", signingPublic.toString())
                             .put("publicKeyTrapdoor", trapdoorPublic.toString())
 

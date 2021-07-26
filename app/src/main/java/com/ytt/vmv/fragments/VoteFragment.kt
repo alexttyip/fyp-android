@@ -11,9 +11,17 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.color.MaterialColors
 import com.ytt.vmv.R
+import com.ytt.vmv.cryptography.EncryptAndSignVote
+import com.ytt.vmv.cryptography.KeyPair
+import com.ytt.vmv.cryptography.Parameters
+import com.ytt.vmv.cryptography.VoterKeyGenerator
+import com.ytt.vmv.database.Election
+import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.databinding.FragmentVoteBinding
 import com.ytt.vmv.databinding.ListCardItemBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class VoteFragment : Fragment() {
 
     private val args: VoteFragmentArgs by navArgs()
@@ -23,11 +31,11 @@ class VoteFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentVoteBinding.inflate(inflater, container, false)
 
-        val (_, options) = args.electionAndOptions
+        val (election, options) = args.electionAndOptions
 
         val linear = binding.linear
 
@@ -54,6 +62,7 @@ class VoteFragment : Fragment() {
                     .setMessage("You voted for: $name\n\nDo you wish to proceed?")
                     .setPositiveButton(android.R.string.ok) { _, _ ->
 
+                        encryptVote(election, selected)
                         // TODO encrypt
                         /* val req = object : StringRequest(Method.POST, VOTE_URL, { response ->
                             Log.e("Response", response)
@@ -95,5 +104,24 @@ class VoteFragment : Fragment() {
         cards.forEachIndexed { index, view ->
             view.setBackgroundColor(if (i == index) selectedCardColor else defaultCardColor)
         }
+    }
+
+    private fun encryptVote(election: Election, selected: ElectionOption) {
+        val (electionName, _, _, g, p, q, electionPublicKey, publicKeySignature) = election
+        val params = Parameters(g, p, q)
+
+        val privateKeySignature =
+            VoterKeyGenerator.getPrivateKey(
+                requireActivity().applicationContext, electionName,
+                VoterKeyGenerator.PrivateKey.SIGNATURE_PRIVATE_KEY
+            )
+
+        val (encryptedVote, proof) = EncryptAndSignVote.encryptVotes(
+            params,
+            electionPublicKey,
+            KeyPair(privateKeySignature, publicKeySignature!!),
+            selected.optionNumberInGroup
+        )
+
     }
 }

@@ -5,16 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.math.BigInteger
 
 @Database(entities = [Election::class, ElectionOption::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun electionDao(): ElectionDao
 
+/*
     private class AppDatabaseCallback(
         private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
@@ -60,12 +57,15 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
     }
+*/
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context, scope: CoroutineScope): AppDatabase {
+        fun getDatabase(
+            context: Context, //, scope: CoroutineScope
+        ): AppDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
@@ -79,7 +79,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "vmv_database"
                 )
-                    .addCallback(AppDatabaseCallback(scope))
+//                    .addCallback(AppDatabaseCallback(scope))
                     .build()
 
                 INSTANCE = instance

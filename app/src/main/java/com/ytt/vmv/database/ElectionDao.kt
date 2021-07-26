@@ -11,7 +11,7 @@ interface ElectionDao {
 
     @Transaction
     @Query("SELECT * FROM election WHERE name = :name LIMIT 1")
-    suspend fun getElectionAndOptionsByName(name: String): ElectionAndOptions
+    fun getElectionAndOptionsByName(name: String): Flow<ElectionAndOptions>
 
     @Insert
     suspend fun insert(election: Election)

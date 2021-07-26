@@ -4,15 +4,22 @@ import androidx.lifecycle.*
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
-class ElectionViewModel(private val repository: ElectionRepository) : ViewModel() {
+@HiltViewModel
+class ElectionViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: ElectionRepository,
+) : ViewModel() {
 
     val allElections: LiveData<List<Election>> = repository.allElections.asLiveData()
 
     fun getByName(name: String) = runBlocking {
-        repository.getByName(name)
+        repository.getByName(name).first()
     }
 
     fun insert(election: Election) = viewModelScope.launch {
@@ -32,13 +39,13 @@ class ElectionViewModel(private val repository: ElectionRepository) : ViewModel(
     }
 }
 
-class ElectionViewModelFactory(private val repository: ElectionRepository) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ElectionViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return ElectionViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+//class ElectionViewModelFactory(private val repository: ElectionRepository) :
+//    ViewModelProvider.Factory {
+//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//        if (modelClass.isAssignableFrom(ElectionViewModel::class.java)) {
+//            @Suppress("UNCHECKED_CAST")
+//            return ElectionViewModel(repository) as T
+//        }
+//        throw IllegalArgumentException("Unknown ViewModel class")
+//    }
+//}

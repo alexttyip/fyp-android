@@ -3,13 +3,17 @@ package com.ytt.vmv.database
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ElectionRepository(private val electionDao: ElectionDao) {
+@Singleton
+class ElectionRepository @Inject constructor(
+    private val electionDao: ElectionDao,
+) {
 
     val allElections: Flow<List<Election>> = electionDao.getAll()
 
-    @WorkerThread
-    suspend fun getByName(name: String) = electionDao.getElectionAndOptionsByName(name)
+    fun getByName(name: String) = electionDao.getElectionAndOptionsByName(name)
 
     @WorkerThread
     suspend fun insert(election: Election) {

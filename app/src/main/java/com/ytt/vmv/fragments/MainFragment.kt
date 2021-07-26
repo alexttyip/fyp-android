@@ -16,30 +16,27 @@ import androidx.recyclerview.widget.*
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.snackbar.Snackbar
-import com.ytt.vmv.VMVApplication
 import com.ytt.vmv.database.Election
-import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.databinding.ListOneLineItemBinding
 import com.ytt.vmv.models.ElectionViewModel
-import com.ytt.vmv.models.ElectionViewModelFactory
 import com.ytt.vmv.network.NetworkSingleton
+import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import java.math.BigInteger
 
 const val PARAMS_URL = "https://snapfile.tech/voter/getElectionParams"
 
+@AndroidEntryPoint
 class MainFragment : Fragment(), ElectionItemClickListener {
     private var fragmentMainBinding: FragmentMainBinding? = null
 
-    private val electionViewModel: ElectionViewModel by viewModels {
-        ElectionViewModelFactory((requireActivity().application as VMVApplication).electionRepository)
-    }
+    private val electionViewModel: ElectionViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
         fragmentMainBinding = binding
@@ -107,19 +104,19 @@ class MainFragment : Fragment(), ElectionItemClickListener {
     }
 
     private fun saveElectionParams(name: String, params: JSONObject) {
-        // TODO voterId, numTellers, thresholdTellers
+        // TODO numTellers, thresholdTellers
         val election = Election(
             name,
-            1,
             4,
             3,
             BigInteger(params.getString("g")),
             BigInteger(params.getString("p")),
             BigInteger(params.getString("q")),
+            BigInteger(params.getString("electionPublicKey")),
         )
 
         electionViewModel.insert(election)
-
+/*
         val optionsJson = params.getJSONArray("voteOptions")
         (0 until optionsJson.length()).forEach { i ->
             val obj = optionsJson.getJSONObject(i)
@@ -135,10 +132,11 @@ class MainFragment : Fragment(), ElectionItemClickListener {
                 )
             )
         }
+*/
     }
 
     class ElectionListAdapter(
-        private val itemClickListener: ElectionItemClickListener
+        private val itemClickListener: ElectionItemClickListener,
     ) :
         ListAdapter<Election, ElectionListAdapter.ElectionViewHolder>(ElectionsComparator()) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElectionViewHolder {
