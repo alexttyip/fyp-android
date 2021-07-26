@@ -24,8 +24,6 @@ data class Election(
     val deviceId: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     fun hasGeneratedKeyPairs() = (publicKeySignature != null) && (publicKeyTrapdoor != null)
-
-    fun getViewKeysText() = if (hasGeneratedKeyPairs()) "View Keys" else "Generate Keys"
 }
 
 @Parcelize

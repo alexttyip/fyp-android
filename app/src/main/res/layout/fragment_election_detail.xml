@@ -6,13 +6,21 @@
 
     <data>
 
-        <variable
-            name="model"
-            type="com.ytt.vmv.database.Election" />
+        <import type="android.view.View" />
+
+        <import type="com.ytt.vmv.database.Election" />
 
         <variable
-            name="view_keys_callback"
+            name="viewModel"
+            type="com.ytt.vmv.models.ElectionDetailViewModel" />
+
+        <variable
+            name="viewKeysCallback"
             type="com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback" />
+
+        <variable
+            name="voteCallback"
+            type="com.ytt.vmv.fragments.ElectionDetailFragment.VoteCallback" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -29,7 +37,7 @@
                 android:id="@+id/text_num_tellers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{`No. tellers: ` + Integer.toString(model.numTellers)}"
+                android:text="@{`No. tellers: ` + Integer.toString(viewModel.numTellers)}"
                 app:layout_constraintBottom_toTopOf="@+id/text_threshold_tellers"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -41,7 +49,7 @@
                 android:id="@+id/text_threshold_tellers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{`No. threshold tellers: ` + Integer.toString(model.thresholdTellers)}"
+                android:text="@{`No. threshold tellers: ` + Integer.toString(viewModel.thresholdTellers)}"
                 app:layout_constraintBottom_toTopOf="@+id/btn_view_keys"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -53,8 +61,8 @@
                 android:id="@+id/btn_view_keys"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> view_keys_callback.view(model)}"
-                android:text="@{model.getViewKeysText()}"
+                android:onClick="@{() -> viewKeysCallback.view(viewModel.election.name)}"
+                android:text="@{viewModel.getViewKeysText()}"
                 app:layout_constraintBottom_toTopOf="@+id/btn_vote"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -66,6 +74,7 @@
                 android:id="@+id/text_election_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="@{viewModel.isVotingEnabled()?View.VISIBLE:View.GONE}"
                 app:layout_constraintBottom_toTopOf="@id/btn_vote"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +84,8 @@
                 android:id="@+id/btn_vote"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:enabled="false"
+                android:enabled="@{viewModel.isVotingEnabled()}"
+                android:onClick="@{() -> voteCallback.vote(viewModel.election.name)}"
                 android:text="Vote"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

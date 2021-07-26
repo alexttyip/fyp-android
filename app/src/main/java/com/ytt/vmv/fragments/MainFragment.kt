@@ -184,13 +184,10 @@ class MainFragment : Fragment(), ElectionItemClickListener {
     }
 
     override fun onItemClick(election: Election) {
-        val electionWithOptions = electionViewModel.getByName(election.name)
-
         findNavController()
             .navigate(
                 MainFragmentDirections.actionMainFragmentToElectionDetailFragment(
-                    election.name,
-                    electionWithOptions
+                    election.name
                 )
             )
     }

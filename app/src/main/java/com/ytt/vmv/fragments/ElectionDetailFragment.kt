@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.ytt.vmv.database.Election
 import com.ytt.vmv.databinding.FragmentElectionDetailBinding
 import com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback
+import com.ytt.vmv.fragments.ElectionDetailFragment.VoteCallback
+import com.ytt.vmv.models.ElectionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ElectionDetailFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
-    private val args: ElectionDetailFragmentArgs by navArgs()
+    private val electionDetailViewModel: ElectionDetailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,52 +25,32 @@ class ElectionDetailFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener 
     ): View {
         val binding = FragmentElectionDetailBinding.inflate(inflater, container, false)
 
-        val electionAndOptions = args.electionAndOptions
-        val (election) = electionAndOptions
-
         binding.apply {
             swipeRefresh.setOnRefreshListener(this@ElectionDetailFragment)
 
-            model = election
-
             viewKeysCallback = ViewKeysCallback {
-                findNavController().navigate(
-                    if (it.hasGeneratedKeyPairs())
-                        ElectionDetailFragmentDirections.actionElectionDetailFragmentToViewKeyFragment(
-                            election.name,
-//                            election
-                        )
-                    else
-                        ElectionDetailFragmentDirections.actionElectionDetailFragmentToGenerateKeyFragment(
-                            election.name,
-                            election
-                        )
-                )
+                findNavController().navigate(electionDetailViewModel.getViewKeysDest())
             }
-        }
 
-        // TODO
-        binding.btnVote.also {
-            it.isEnabled =
-                election.hasGeneratedKeyPairs() && electionAndOptions.hasElectionStarted()
-
-            it.setOnClickListener {
-                findNavController().navigate(
-                    ElectionDetailFragmentDirections.actionElectionDetailFragmentToVoteFragment(
-                        election.name,
-                        args.electionAndOptions
-                    )
-                )
+            voteCallback = VoteCallback {
+                findNavController().navigate(electionDetailViewModel.getVoteDest())
             }
+
+            viewModel = electionDetailViewModel
         }
 
         return binding.root
     }
 
     override fun onRefresh() {
+        electionDetailViewModel.refresh()
     }
 
     fun interface ViewKeysCallback {
-        fun view(election: Election)
+        fun view(electionName: String)
+    }
+
+    fun interface VoteCallback {
+        fun vote(electionName: String)
     }
 }

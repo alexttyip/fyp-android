@@ -21,14 +21,11 @@
     <fragment
         android:id="@+id/voteFragment"
         android:name="com.ytt.vmv.fragments.VoteFragment"
-        android:label="{label}"
+        android:label="{election}"
         tools:layout="@layout/fragment_vote">
         <argument
-            android:name="label"
+            android:name="election"
             app:argType="string" />
-        <argument
-            android:name="electionAndOptions"
-            app:argType="com.ytt.vmv.database.ElectionAndOptions" />
     </fragment>
     <fragment
         android:id="@+id/keyListFragment"
@@ -38,14 +35,11 @@
     <fragment
         android:id="@+id/electionDetailFragment"
         android:name="com.ytt.vmv.fragments.ElectionDetailFragment"
-        android:label="{label}"
+        android:label="{election}"
         tools:layout="@layout/fragment_election_detail">
         <argument
-            android:name="label"
+            android:name="election"
             app:argType="string" />
-        <argument
-            android:name="electionAndOptions"
-            app:argType="com.ytt.vmv.database.ElectionAndOptions" />
         <action
             android:id="@+id/action_electionDetailFragment_to_generateKeyFragment"
             app:destination="@id/generateKeyFragment" />
