@@ -2,9 +2,7 @@ package com.ytt.vmv.fragments
 
 import androidx.fragment.app.Fragment
 
-class KeyListFragment : Fragment() {
-
-}
+class KeyListFragment : Fragment()
 // TODO
 //import android.annotation.SuppressLint
 //import android.os.Bundle

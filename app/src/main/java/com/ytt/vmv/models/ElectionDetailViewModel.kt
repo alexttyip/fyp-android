@@ -1,25 +1,43 @@
 package com.ytt.vmv.models
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import android.util.Log
+import androidx.lifecycle.*
 import androidx.navigation.NavDirections
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonObjectRequest
+import com.ytt.vmv.Event
+import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionRepository
 import com.ytt.vmv.fragments.ElectionDetailFragmentDirections
+import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.math.BigInteger
 import javax.inject.Inject
 
 @HiltViewModel
 class ElectionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    repository: ElectionRepository,
-) : ViewModel() {
+    private val repository: ElectionRepository,
+    private val network: NetworkSingleton,
+) : ViewModel(), Response.Listener<JSONObject>, Response.ErrorListener {
     private val electionName: String =
         savedStateHandle.get<String>("election") ?: ""
 
     val election = repository.getOnlyElectionByName(electionName).asLiveData()
 
-    fun getViewKeysDest(): NavDirections? = election.value?.let {
+    private val _userParamNav = MutableLiveData<Event<NavDirections>>()
+    private val _snackBarError = MutableLiveData<Event<String>>()
+
+    val userParamNav: LiveData<Event<NavDirections>>
+        get() = _userParamNav
+    val snackBarError: LiveData<Event<String>>
+        get() = _snackBarError
+
+    fun getViewKeysDest() = election.value?.let {
         if (it.hasGeneratedKeyPairs())
             ElectionDetailFragmentDirections
                 .actionElectionDetailFragmentToViewKeyFragment(it.name)
@@ -28,8 +46,77 @@ class ElectionDetailViewModel @Inject constructor(
                 .actionElectionDetailFragmentToGenerateKeyFragment(it.name)
     }
 
-    fun getVoteDest(): NavDirections? = election.value?.let {
+    fun getUserParam() {
+        election.value?.let {
+            val param = JSONObject()
+                .put("electionName", it.name)
+                .put("deviceId", it.deviceId)
+
+            // Get user param
+            val req = JsonObjectRequest(
+                Request.Method.POST,
+                USER_PARAM_URL,
+                param,
+                this,
+                this
+            )
+
+            network.addToRequestQueue(req)
+        }
+    }
+
+    fun getVoteDest() = election.value?.let {
         ElectionDetailFragmentDirections
             .actionElectionDetailFragmentToVoteFragment(it.name)
+    }
+
+    private fun Election.getUserParamDest() = ElectionDetailFragmentDirections
+        .actionElectionDetailFragmentToUserParamFragment(
+            name,
+            beta.toString(),
+            encryptedTrackerNumberInGroup.toString(),
+        )
+
+    override fun onResponse(response: JSONObject?) {
+        response ?: return
+
+        val respBeta = BigInteger(response.getString("beta"))
+        val respETNIG =
+            BigInteger(response.getString("encryptedTrackerNumberInGroup"))
+
+        election.value?.apply {
+            beta = respBeta
+            encryptedTrackerNumberInGroup = respETNIG
+
+            viewModelScope.launch {
+                repository.update(this@apply)
+            }
+
+            _userParamNav.value = Event(getUserParamDest())
+        }
+    }
+
+    override fun onErrorResponse(error: VolleyError?) {
+        error ?: return
+
+        val resp = JSONObject(String(error.networkResponse.data))
+        Log.e("Resp", resp.toString())
+
+        val errorMsg = when (resp.getString("code")) {
+            UserParamErrors.ELECTION_NOT_STARTED.name -> "Election hasn't started."
+            else -> "Server error."
+        }
+
+        _snackBarError.value = Event(errorMsg)
+    }
+
+    companion object {
+        private const val USER_PARAM_URL = "https://snapfile.tech/voter/getVoterParams"
+
+        enum class UserParamErrors {
+            ELECTION_NOT_STARTED,
+            NO_SUCH_VOTER,
+            UNKNOWN
+        }
     }
 }

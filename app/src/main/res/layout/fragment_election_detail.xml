@@ -15,12 +15,16 @@
             type="com.ytt.vmv.models.ElectionDetailViewModel" />
 
         <variable
-            name="viewKeysCallback"
-            type="com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback" />
+            name="onClickViewKeys"
+            type="com.ytt.vmv.fragments.ElectionDetailFragment.OnClickViewKeys" />
 
         <variable
-            name="voteCallback"
-            type="com.ytt.vmv.fragments.ElectionDetailFragment.VoteCallback" />
+            name="onClickUserParam"
+            type="com.ytt.vmv.fragments.ElectionDetailFragment.OnClickUserParam" />
+
+        <variable
+            name="onClickVote"
+            type="com.ytt.vmv.fragments.ElectionDetailFragment.OnClickVote" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -61,36 +65,51 @@
                 android:id="@+id/btn_view_keys"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> viewKeysCallback.view(viewModel.election.name)}"
+                android:onClick="@{() -> onClickViewKeys.click(viewModel.election.name)}"
                 android:text="@{viewModel.election.hasGeneratedKeyPairs() ? `View Keys` : `Generate Keys`}"
-                app:layout_constraintBottom_toTopOf="@+id/btn_vote"
+                app:layout_constraintBottom_toTopOf="@+id/btn_user_params"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_threshold_tellers"
                 tools:text="View keys" />
 
+            <Button
+                android:id="@+id/btn_user_params"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="@{viewModel.election.hasGeneratedKeyPairs()}"
+                android:onClick="@{() -> onClickUserParam.click(viewModel.election.name)}"
+                android:text="Get User Params"
+                app:layout_constraintBottom_toTopOf="@+id/btn_vote"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_view_keys" />
+
             <TextView
                 android:id="@+id/text_election_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.election.hasGeneratedKeyPairs() ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toTopOf="@id/btn_vote"
+                android:text="Election has not begun"
+                android:visibility="@{viewModel.election.hasObtainedUserParams() ? View.INVISIBLE : View.VISIBLE}"
+                app:layout_constraintBottom_toTopOf="@+id/btn_vote"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="Election has not begun" />
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <Button
                 android:id="@+id/btn_vote"
-                android:layout_width="0dp"
+                android:layout_width="379dp"
                 android:layout_height="wrap_content"
-                android:enabled="@{viewModel.election.hasGeneratedKeyPairs()}"
-                android:onClick="@{() -> voteCallback.vote(viewModel.election.name)}"
+                android:enabled="@{viewModel.election.hasObtainedUserParams()}"
+                android:onClick="@{() -> onClickVote.click(viewModel.election.name)}"
                 android:text="Vote"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_view_keys" />
+                app:layout_constraintTop_toBottomOf="@+id/btn_user_params" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

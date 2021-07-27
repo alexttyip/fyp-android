@@ -21,9 +21,15 @@ data class Election(
     val electionPublicKey: BigInteger,
     var publicKeySignature: BigInteger? = null,
     var publicKeyTrapdoor: BigInteger? = null,
+    var beta: BigInteger? = null,
+    var encryptedTrackerNumberInGroup: BigInteger? = null,
     val deviceId: String = UUID.randomUUID().toString(),
 ) : Parcelable {
-    fun hasGeneratedKeyPairs() = (publicKeySignature != null) && (publicKeyTrapdoor != null)
+    fun hasGeneratedKeyPairs() =
+        publicKeySignature != null && publicKeyTrapdoor != null
+
+    fun hasObtainedUserParams() =
+        hasGeneratedKeyPairs() && beta != null && encryptedTrackerNumberInGroup != null
 }
 
 @Parcelize

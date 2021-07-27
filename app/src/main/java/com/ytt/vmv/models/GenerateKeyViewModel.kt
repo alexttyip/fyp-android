@@ -5,9 +5,9 @@ import androidx.lifecycle.*
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
+import com.ytt.vmv.Event
 import com.ytt.vmv.cryptography.VoterKeyGenerator
 import com.ytt.vmv.database.ElectionRepository
-import com.ytt.vmv.fragments.UPLOAD_KEYS_URL
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,8 +27,13 @@ class GenerateKeyViewModel @Inject constructor(
     val election = repository.getOnlyElectionByName(electionName).asLiveData()
 
     val isOverlayVisible = MutableLiveData(false)
-    val uploadResp = MutableLiveData<String?>(null)
-    val uploadError = MutableLiveData<VolleyError?>(null)
+    private val _uploadResp = MutableLiveData<Event<String>>()
+    private val _uploadError = MutableLiveData<Event<VolleyError>>()
+
+    val uploadResp: LiveData<Event<String>>
+        get() = _uploadResp
+    val uploadError: LiveData<Event<VolleyError>>
+        get() = _uploadError
 
     fun onGenKeys() {
         election.value?.apply {
@@ -72,14 +77,17 @@ class GenerateKeyViewModel @Inject constructor(
         }
     }
 
-    override fun onResponse(response: String?) {
+    override fun onResponse(response: String) {
         isOverlayVisible.value = false
-        uploadResp.value = response
+        _uploadResp.value = Event(response)
     }
 
-    override fun onErrorResponse(error: VolleyError?) {
+    override fun onErrorResponse(error: VolleyError) {
         isOverlayVisible.value = false
-        uploadError.value = error
+        _uploadError.value = Event(error)
     }
 
+    companion object {
+        private const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
+    }
 }

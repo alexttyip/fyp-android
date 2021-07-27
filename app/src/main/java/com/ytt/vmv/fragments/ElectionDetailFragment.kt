@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.databinding.FragmentElectionDetailBinding
-import com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback
-import com.ytt.vmv.fragments.ElectionDetailFragment.VoteCallback
+import com.ytt.vmv.fragments.ElectionDetailFragment.*
 import com.ytt.vmv.models.ElectionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,27 +22,52 @@ class ElectionDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        return FragmentElectionDetailBinding.inflate(inflater, container, false)
+        val binding = FragmentElectionDetailBinding.inflate(inflater, container, false)
             .apply {
                 lifecycleOwner = this@ElectionDetailFragment
                 viewModel = electionDetailViewModel
 
-                viewKeysCallback = ViewKeysCallback {
+                onClickViewKeys = OnClickViewKeys {
                     electionDetailViewModel.getViewKeysDest()
                         ?.let { findNavController().navigate(it) }
                 }
 
-                voteCallback = VoteCallback {
+                onClickUserParam = OnClickUserParam {
+                    electionDetailViewModel.getUserParam()
+                }
+
+                onClickVote = OnClickVote {
                     electionDetailViewModel.getVoteDest()?.let { findNavController().navigate(it) }
                 }
-            }.root
+            }
+
+        with(electionDetailViewModel) {
+            userParamNav.observe(viewLifecycleOwner) { event ->
+                event.getContentIfNotHandled()?.let { findNavController().navigate(it) }
+            }
+
+            snackBarError.observe(viewLifecycleOwner) { event ->
+                event.getContentIfNotHandled()?.let {
+                    Snackbar.make(binding.root,
+                        it,
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+
+        return binding.root
     }
 
-    fun interface ViewKeysCallback {
-        fun view(electionName: String)
+    fun interface OnClickViewKeys {
+        fun click(electionName: String)
     }
 
-    fun interface VoteCallback {
-        fun vote(electionName: String)
+    fun interface OnClickUserParam {
+        fun click(electionName: String)
+    }
+
+    fun interface OnClickVote {
+        fun click(electionName: String)
     }
 }

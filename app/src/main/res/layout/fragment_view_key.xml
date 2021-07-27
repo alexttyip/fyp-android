@@ -11,7 +11,7 @@
 
         <variable
             name="paramDialogCallback"
-            type="com.ytt.vmv.fragments.ViewKeyFragment.ParamDialogCallback" />
+            type="com.ytt.vmv.interfaces.OnClickParam" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,7 +27,7 @@
             android:id="@+id/btn_g"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`param g`, viewModel.election.g)}"
+            android:onClick="@{() -> paramDialogCallback.click(`param g`, viewModel.election.g)}"
             android:text="View g parameter"
             app:layout_constraintBottom_toTopOf="@+id/btn_p"
             app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +39,7 @@
             android:id="@+id/btn_p"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`param p`, viewModel.election.p)}"
+            android:onClick="@{() -> paramDialogCallback.click(`param p`, viewModel.election.p)}"
             android:text="View p parameter"
             app:layout_constraintBottom_toTopOf="@+id/btn_q"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
             android:id="@+id/btn_q"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`param q`, viewModel.election.q)}"
+            android:onClick="@{() -> paramDialogCallback.click(`param q`, viewModel.election.q)}"
             android:text="View q parameter"
             app:layout_constraintBottom_toTopOf="@+id/btn_signature_private"
             app:layout_constraintEnd_toEndOf="parent"
@@ -63,7 +63,7 @@
             android:id="@+id/btn_signature_public"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`signature public key`, viewModel.election.publicKeySignature)}"
+            android:onClick="@{() -> paramDialogCallback.click(`signature public key`, viewModel.election.publicKeySignature)}"
             android:text="View signature public key"
             app:layout_constraintBottom_toTopOf="@+id/btn_trapdoor_private"
             app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
             android:id="@+id/btn_signature_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`signature private key`, viewModel.privateKeySignature)}"
+            android:onClick="@{() -> paramDialogCallback.click(`signature private key`, viewModel.privateKeySignature)}"
             android:text="View signature private key"
             app:layout_constraintBottom_toTopOf="@+id/btn_signature_public"
             app:layout_constraintEnd_toEndOf="parent"
@@ -87,7 +87,7 @@
             android:id="@+id/btn_trapdoor_public"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`trapdoor public key`, viewModel.election.publicKeyTrapdoor)}"
+            android:onClick="@{() -> paramDialogCallback.click(`trapdoor public key`, viewModel.election.publicKeyTrapdoor)}"
             android:text="View trapdoor public key"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +99,7 @@
             android:id="@+id/btn_trapdoor_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> paramDialogCallback.view(`trapdoor private key`, viewModel.privateKeyTrapdoor)}"
+            android:onClick="@{() -> paramDialogCallback.click(`trapdoor private key`, viewModel.privateKeyTrapdoor)}"
             android:text="View trapdoor private key"
             app:layout_constraintBottom_toTopOf="@+id/btn_trapdoor_public"
             app:layout_constraintEnd_toEndOf="parent"

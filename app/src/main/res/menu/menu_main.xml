@@ -1,8 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_view_keys"
-        android:icon="@drawable/ic_key"
-        android:title="@string/action_view_key_list"
-        app:showAsAction="ifRoom" />
-</menu>

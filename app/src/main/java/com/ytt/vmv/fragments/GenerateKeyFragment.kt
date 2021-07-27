@@ -12,9 +12,6 @@ import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
 import com.ytt.vmv.models.GenerateKeyViewModel
 import com.ytt.vmv.showParamDialog
 import dagger.hilt.android.AndroidEntryPoint
-import java.math.BigInteger
-
-const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
 
 @AndroidEntryPoint
 class GenerateKeyFragment : Fragment() {
@@ -30,8 +27,8 @@ class GenerateKeyFragment : Fragment() {
                 lifecycleOwner = this@GenerateKeyFragment
 
                 viewModel = genKeyViewModel.also {
-                    it.uploadResp.observe(viewLifecycleOwner) { resp ->
-                        if (resp == null) return@observe
+                    it.uploadResp.observe(viewLifecycleOwner) { event ->
+                        !event.hasBeenHandled || return@observe
 
                         Snackbar.make(
                             container!!,
@@ -42,8 +39,8 @@ class GenerateKeyFragment : Fragment() {
                         findNavController().navigateUp()
                     }
 
-                    it.uploadError.observe(viewLifecycleOwner) { error ->
-                        if (error == null) return@observe
+                    it.uploadError.observe(viewLifecycleOwner) { event ->
+                        !event.hasBeenHandled || return@observe
 
                         Snackbar.make(
                             container!!,
@@ -57,9 +54,5 @@ class GenerateKeyFragment : Fragment() {
                     showParamDialog(requireContext(), paramName, value)
                 }
             }.root
-    }
-
-    fun interface ParamDialogCallback {
-        fun view(paramName: String, value: BigInteger)
     }
 }

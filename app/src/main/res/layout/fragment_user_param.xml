@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.ytt.vmv.models.UserParamViewModel" />
+
+        <variable
+            name="onParamClick"
+            type="com.ytt.vmv.interfaces.OnClickParam" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.UserParamFragment">
+
+        <Button
+            android:id="@+id/btn_beta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{()-> onParamClick.click(`beta`, viewModel.beta)}"
+            android:text="Beta value"
+            app:layout_constraintBottom_toTopOf="@+id/btn_encrypted_tnig"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_encrypted_tnig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{()-> onParamClick.click(`encrypted tracker number in group`, viewModel.encryptedTNIG)}"
+            android:text="Encrypted Tracker Number In Group"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_beta" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

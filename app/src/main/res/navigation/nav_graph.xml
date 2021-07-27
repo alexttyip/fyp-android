@@ -11,9 +11,6 @@
         android:label="@string/main_fragment_label"
         tools:layout="@layout/fragment_main">
         <action
-            android:id="@+id/action_mainFragment_to_keyListFragment"
-            app:destination="@id/keyListFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_electionDetailFragment"
             app:destination="@id/electionDetailFragment" />
     </fragment>
@@ -27,11 +24,6 @@
             android:name="election"
             app:argType="string" />
     </fragment>
-    <fragment
-        android:id="@+id/keyListFragment"
-        android:name="com.ytt.vmv.fragments.KeyListFragment"
-        android:label="@string/key_list_fragment_label"
-        tools:layout="@layout/fragment_key_list" />
     <fragment
         android:id="@+id/electionDetailFragment"
         android:name="com.ytt.vmv.fragments.ElectionDetailFragment"
@@ -49,6 +41,9 @@
         <action
             android:id="@+id/action_electionDetailFragment_to_voteFragment"
             app:destination="@id/voteFragment" />
+        <action
+            android:id="@+id/action_electionDetailFragment_to_userParamFragment"
+            app:destination="@id/userParamFragment" />
     </fragment>
     <fragment
         android:id="@+id/generateKeyFragment"
@@ -66,6 +61,21 @@
         tools:layout="@layout/fragment_view_key">
         <argument
             android:name="election"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/userParamFragment"
+        android:name="com.ytt.vmv.fragments.UserParamFragment"
+        android:label="{election}"
+        tools:layout="@layout/fragment_user_param">
+        <argument
+            android:name="election"
+            app:argType="string" />
+        <argument
+            android:name="beta"
+            app:argType="string" />
+        <argument
+            android:name="encryptedTNIG"
             app:argType="string" />
     </fragment>
 </navigation>
