@@ -1,51 +1,79 @@
 package com.ytt.vmv.models
 
-import androidx.lifecycle.*
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.ytt.vmv.database.Election
-import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
+import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
+import java.math.BigInteger
 import javax.inject.Inject
+
+const val PARAMS_URL = "https://snapfile.tech/voter/getElectionParams"
 
 @HiltViewModel
 class ElectionViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val repository: ElectionRepository,
+    private val network: NetworkSingleton,
 ) : ViewModel() {
-
-    val allElections: LiveData<List<Election>> = repository.allElections.asLiveData()
-
-    fun getByName(name: String) = runBlocking {
-        repository.getByName(name).first()
-    }
-
-    fun insert(election: Election) = viewModelScope.launch {
-        repository.insert(election)
-    }
-
-    fun insert(electionOption: ElectionOption) = viewModelScope.launch {
-        repository.insert(electionOption)
-    }
-
-    fun update(election: Election) = viewModelScope.launch {
-        repository.update(election)
-    }
+    val allElections = repository.allElections.asLiveData()
 
     fun updateFromRemote() = viewModelScope.launch {
         repository.updateFromRemote()
     }
-}
 
-//class ElectionViewModelFactory(private val repository: ElectionRepository) :
-//    ViewModelProvider.Factory {
-//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//        if (modelClass.isAssignableFrom(ElectionViewModel::class.java)) {
-//            @Suppress("UNCHECKED_CAST")
-//            return ElectionViewModel(repository) as T
-//        }
-//        throw IllegalArgumentException("Unknown ViewModel class")
-//    }
-//}
+    fun addElection(
+        input: String,
+        callback: () -> Unit,
+        errorCallback: (error: String) -> Unit,
+    ) {
+        if (input.isBlank()) {
+            errorCallback("Input cannot be blank.")
+            return
+        }
+
+        Log.e("Input", input)
+
+        val req = JsonObjectRequest(
+            Request.Method.GET,
+            "$PARAMS_URL/${input}",
+            null,
+            { response ->
+                Log.e("Response", response.toString())
+
+                saveElectionParams(input, response)
+
+                callback()
+            },
+            { error ->
+                Log.e("Error", error.toString())
+                errorCallback(error.toString())
+            }
+        )
+
+        network.addToRequestQueue(req)
+    }
+
+    private fun saveElectionParams(name: String, params: JSONObject) {
+        // TODO numTellers, thresholdTellers
+        val election = Election(
+            name,
+            4,
+            3,
+            BigInteger(params.getString("g")),
+            BigInteger(params.getString("p")),
+            BigInteger(params.getString("q")),
+            BigInteger(params.getString("electionPublicKey")),
+        )
+
+        viewModelScope.launch {
+            repository.insert(election)
+        }
+    }
+}

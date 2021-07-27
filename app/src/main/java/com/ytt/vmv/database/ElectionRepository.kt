@@ -15,6 +15,8 @@ class ElectionRepository @Inject constructor(
 
     fun getByName(name: String) = electionDao.getElectionAndOptionsByName(name)
 
+    fun getOnlyElectionByName(name: String) = electionDao.getElectionByName(name)
+
     @WorkerThread
     suspend fun insert(election: Election) {
         electionDao.insert(election)

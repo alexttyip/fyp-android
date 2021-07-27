@@ -1,71 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    <data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+        <import type="android.view.View" />
+
+        <import type="com.ytt.vmv.database.Election" />
+
+        <variable
+            name="viewModel"
+            type="com.ytt.vmv.models.GenerateKeyViewModel" />
+
+        <variable
+            name="paramDialogCallback"
+            type="com.ytt.vmv.fragments.GenerateKeyFragment.ParamDialogCallback" />
+    </data>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="16dp">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btn_g"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View g parameter"
-            app:layout_constraintBottom_toTopOf="@+id/btn_p"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp">
 
-        <Button
-            android:id="@+id/btn_p"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View p parameter"
-            app:layout_constraintBottom_toTopOf="@+id/btn_q"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_g" />
+            <Button
+                android:id="@+id/btn_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> paramDialogCallback.view(`param g`, viewModel.election.g)}"
+                android:text="View g parameter"
+                app:layout_constraintBottom_toTopOf="@+id/btn_p"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btn_q"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View q parameter"
-            app:layout_constraintBottom_toTopOf="@+id/btn_gen_key"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_p" />
+            <Button
+                android:id="@+id/btn_p"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> paramDialogCallback.view(`param p`, viewModel.election.p)}"
+                android:text="View p parameter"
+                app:layout_constraintBottom_toTopOf="@+id/btn_q"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_g" />
 
-        <Button
-            android:id="@+id/btn_gen_key"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Generate Keys"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_q" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/btn_q"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> paramDialogCallback.view(`param q`, viewModel.election.q)}"
+                android:text="View q parameter"
+                app:layout_constraintBottom_toTopOf="@+id/btn_gen_key"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_p" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#99000000"
-        android:visibility="gone">
+            <Button
+                android:id="@+id/btn_gen_key"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:enabled="@{viewModel.election != null}"
+                android:onClick="@{() -> viewModel.onGenKeys()}"
+                android:text="Generate Keys"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_q" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
+            android:visibility="@{viewModel.isOverlayVisible ? View.VISIBLE : View.GONE}">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>

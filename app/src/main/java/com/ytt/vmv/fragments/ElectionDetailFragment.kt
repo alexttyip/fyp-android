@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytt.vmv.databinding.FragmentElectionDetailBinding
 import com.ytt.vmv.fragments.ElectionDetailFragment.ViewKeysCallback
 import com.ytt.vmv.fragments.ElectionDetailFragment.VoteCallback
@@ -15,7 +14,7 @@ import com.ytt.vmv.models.ElectionDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ElectionDetailFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class ElectionDetailFragment : Fragment() {
     private val electionDetailViewModel: ElectionDetailViewModel by viewModels()
 
     override fun onCreateView(
@@ -23,27 +22,20 @@ class ElectionDetailFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener 
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentElectionDetailBinding.inflate(inflater, container, false)
+        return FragmentElectionDetailBinding.inflate(inflater, container, false)
+            .apply {
+                lifecycleOwner = this@ElectionDetailFragment
+                viewModel = electionDetailViewModel
 
-        binding.apply {
-            swipeRefresh.setOnRefreshListener(this@ElectionDetailFragment)
+                viewKeysCallback = ViewKeysCallback {
+                    electionDetailViewModel.getViewKeysDest()
+                        ?.let { findNavController().navigate(it) }
+                }
 
-            viewKeysCallback = ViewKeysCallback {
-                findNavController().navigate(electionDetailViewModel.getViewKeysDest())
-            }
-
-            voteCallback = VoteCallback {
-                findNavController().navigate(electionDetailViewModel.getVoteDest())
-            }
-
-            viewModel = electionDetailViewModel
-        }
-
-        return binding.root
-    }
-
-    override fun onRefresh() {
-        electionDetailViewModel.refresh()
+                voteCallback = VoteCallback {
+                    electionDetailViewModel.getVoteDest()?.let { findNavController().navigate(it) }
+                }
+            }.root
     }
 
     fun interface ViewKeysCallback {

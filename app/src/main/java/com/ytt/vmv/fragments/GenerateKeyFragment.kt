@@ -1,102 +1,65 @@
 package com.ytt.vmv.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.android.volley.toolbox.StringRequest
 import com.google.android.material.snackbar.Snackbar
-import com.ytt.vmv.VMVApplication
-import com.ytt.vmv.cryptography.VoterKeyGenerator
 import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
-import com.ytt.vmv.models.ElectionViewModel
+import com.ytt.vmv.models.GenerateKeyViewModel
 import com.ytt.vmv.showParamDialog
 import dagger.hilt.android.AndroidEntryPoint
-import org.json.JSONObject
+import java.math.BigInteger
 
 const val UPLOAD_KEYS_URL = "https://snapfile.tech/voter/uploadKeys"
 
 @AndroidEntryPoint
 class GenerateKeyFragment : Fragment() {
-    private val args: GenerateKeyFragmentArgs by navArgs()
-
-    private val electionViewModel: ElectionViewModel by viewModels()
+    private val genKeyViewModel: GenerateKeyViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentGenerateKeyBinding.inflate(inflater, container, false)
+        return FragmentGenerateKeyBinding.inflate(inflater, container, false)
+            .apply {
+                lifecycleOwner = this@GenerateKeyFragment
 
-        val election = args.election
-        val (name, _, _, g, p, q) = election
+                viewModel = genKeyViewModel.also {
+                    it.uploadResp.observe(viewLifecycleOwner) { resp ->
+                        if (resp == null) return@observe
 
-        binding.btnG.setOnClickListener { showParamDialog(requireContext(), "param g", election.g) }
-        binding.btnP.setOnClickListener { showParamDialog(requireContext(), "param p", election.p) }
-        binding.btnQ.setOnClickListener { showParamDialog(requireContext(), "param q", election.q) }
+                        Snackbar.make(
+                            container!!,
+                            "Keys generated successfully",
+                            Snackbar.LENGTH_LONG
+                        ).show()
 
-        val overlay = binding.overlay
-
-        binding.btnGenKey.setOnClickListener {
-            overlay.visibility = View.VISIBLE
-
-            val (signingPublic, trapdoorPublic) = VoterKeyGenerator.genAndStore(
-                requireActivity().applicationContext, name, g, p, q
-            )
-
-            election.publicKeySignature = signingPublic
-            election.publicKeyTrapdoor = trapdoorPublic
-
-            // Save public keys locally
-            electionViewModel.update(election)
-
-            // Upload public keys to backend
-            val req =
-                object : StringRequest(Method.POST, UPLOAD_KEYS_URL, { response ->
-                    Log.e("Response", response.toString())
-
-                    overlay.visibility = View.INVISIBLE
-
-                    Snackbar.make(
-                        container!!,
-                        "Keys generated successfully",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-
-                    findNavController().navigateUp()
-                }, { error ->
-                    Log.e("Error", error.toString())
-
-                    Snackbar.make(
-                        container!!,
-                        "Server error",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-
-                    overlay.visibility = View.INVISIBLE
-                }) {
-                    override fun getBody(): ByteArray {
-                        val jsonObj = JSONObject()
-                            .put("electionName", name)
-                            .put("deviceId", election.deviceId)
-                            .put("publicKeySignature", signingPublic.toString())
-                            .put("publicKeyTrapdoor", trapdoorPublic.toString())
-
-                        return jsonObj.toString().toByteArray()
+                        findNavController().navigateUp()
                     }
 
-                    override fun getBodyContentType() = "application/json; charset=utf-8"
+                    it.uploadError.observe(viewLifecycleOwner) { error ->
+                        if (error == null) return@observe
+
+                        Snackbar.make(
+                            container!!,
+                            "Server error",
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
                 }
 
-            (requireActivity().application as VMVApplication).network.addToRequestQueue(req)
-        }
+                setParamDialogCallback { paramName, value ->
+                    showParamDialog(requireContext(), paramName, value)
+                }
+            }.root
+    }
 
-        return binding.root
+    fun interface ParamDialogCallback {
+        fun view(paramName: String, value: BigInteger)
     }
 }

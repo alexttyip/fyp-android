@@ -53,14 +53,11 @@
     <fragment
         android:id="@+id/generateKeyFragment"
         android:name="com.ytt.vmv.fragments.GenerateKeyFragment"
-        android:label="GenerateKeyFragment"
+        android:label="{election}"
         tools:layout="@layout/fragment_generate_key">
         <argument
-            android:name="label"
-            app:argType="string" />
-        <argument
             android:name="election"
-            app:argType="com.ytt.vmv.database.Election" />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/viewKeyFragment"

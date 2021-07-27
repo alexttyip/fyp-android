@@ -7,29 +7,34 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ytt.vmv.databinding.FragmentViewKeyBinding
+import com.ytt.vmv.fragments.ViewKeyFragment.ParamDialogCallback
 import com.ytt.vmv.models.ViewKeyViewModel
 import com.ytt.vmv.showParamDialog
 import dagger.hilt.android.AndroidEntryPoint
+import java.math.BigInteger
 
 @AndroidEntryPoint
 class ViewKeyFragment : Fragment() {
-    private val viewModel: ViewKeyViewModel by viewModels()
+    private val viewKeyViewModel: ViewKeyViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentViewKeyBinding.inflate(inflater, container, false)
+        return FragmentViewKeyBinding.inflate(inflater, container, false)
+            .apply {
+                lifecycleOwner = this@ViewKeyFragment
+                viewModel = viewKeyViewModel
 
-        viewModel.dialogParams.observe(viewLifecycleOwner) {
-            val (name, value) = it ?: return@observe
+                paramDialogCallback =
+                    ParamDialogCallback { paramName, value ->
+                        showParamDialog(requireContext(), paramName, value)
+                    }
+            }.root
+    }
 
-            showParamDialog(requireContext(), name, value)
-        }
-
-        binding.viewModel = viewModel
-
-        return binding.root
+    fun interface ParamDialogCallback {
+        fun view(paramName: String, value: BigInteger)
     }
 }

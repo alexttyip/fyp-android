@@ -1,7 +1,6 @@
 package com.ytt.vmv.models
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.ytt.vmv.cryptography.VoterKeyGenerator
@@ -21,7 +20,7 @@ class ViewKeyViewModel @Inject constructor(
     @ApplicationContext applicationContext: Context,
 ) : ViewModel() {
     private val electionName: String =
-        savedStateHandle.get<String>(ELECTION_NAME_SAVED_STATE_KEY) ?: ""
+        savedStateHandle.get<String>("election") ?: ""
 
     val election: Election by lazy {
         runBlocking {
@@ -42,16 +41,4 @@ class ViewKeyViewModel @Inject constructor(
             VoterKeyGenerator.PrivateKey.TRAPDOOR_PRIVATE_KEY
         )
     }
-
-    val dialogParams = MutableLiveData<ViewKeyDialog?>(null)
-
-    fun onParamClick(paramName: String, value: BigInteger) {
-        dialogParams.value = ViewKeyDialog(paramName, value)
-    }
-
-    companion object {
-        const val ELECTION_NAME_SAVED_STATE_KEY = "election"
-    }
 }
-
-data class ViewKeyDialog(val name: String, val value: BigInteger)

@@ -68,7 +68,7 @@ class VoterKeyGenerator {
                 apply()
             }
 
-            /* https://developer.android.com/training/articles/keystore#UserAuthentication
+            /* TODO https://developer.android.com/training/articles/keystore#UserAuthentication
             val advancedSpec = KeyGenParameterSpec.Builder(
                 "master_key",
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT

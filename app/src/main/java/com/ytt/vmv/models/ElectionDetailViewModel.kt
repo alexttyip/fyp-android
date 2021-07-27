@@ -2,12 +2,11 @@ package com.ytt.vmv.models
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.ytt.vmv.database.Election
+import androidx.lifecycle.asLiveData
+import androidx.navigation.NavDirections
 import com.ytt.vmv.database.ElectionRepository
 import com.ytt.vmv.fragments.ElectionDetailFragmentDirections
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,44 +15,21 @@ class ElectionDetailViewModel @Inject constructor(
     repository: ElectionRepository,
 ) : ViewModel() {
     private val electionName: String =
-        savedStateHandle.get<String>(ELECTION_NAME_SAVED_STATE_KEY) ?: ""
+        savedStateHandle.get<String>("election") ?: ""
 
-    val election: Election by lazy {
-        runBlocking {
-            repository.getByName(electionName).first().election
-        }
+    val election = repository.getOnlyElectionByName(electionName).asLiveData()
+
+    fun getViewKeysDest(): NavDirections? = election.value?.let {
+        if (it.hasGeneratedKeyPairs())
+            ElectionDetailFragmentDirections
+                .actionElectionDetailFragmentToViewKeyFragment(it.name)
+        else
+            ElectionDetailFragmentDirections
+                .actionElectionDetailFragmentToGenerateKeyFragment(it.name)
     }
 
-    val numTellers = election.numTellers
-    val thresholdTellers = election.thresholdTellers
-
-    fun getViewKeysText() = if (election.hasGeneratedKeyPairs()) "View Keys" else "Generate Keys"
-
-    fun isVotingEnabled() = election.hasGeneratedKeyPairs()
-
-    fun getViewKeysDest() = if (election.hasGeneratedKeyPairs())
+    fun getVoteDest(): NavDirections? = election.value?.let {
         ElectionDetailFragmentDirections
-            .actionElectionDetailFragmentToViewKeyFragment(
-                election.name
-            )
-    else
-        ElectionDetailFragmentDirections
-            .actionElectionDetailFragmentToGenerateKeyFragment(
-                election.name,
-                election
-            )
-
-    fun getVoteDest() =
-        ElectionDetailFragmentDirections
-            .actionElectionDetailFragmentToVoteFragment(
-                election.name
-            )
-
-    fun refresh() {
-
-    }
-
-    companion object {
-        const val ELECTION_NAME_SAVED_STATE_KEY = "election"
+            .actionElectionDetailFragmentToVoteFragment(it.name)
     }
 }
