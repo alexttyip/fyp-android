@@ -1,11 +1,9 @@
 package com.ytt.vmv.fragments
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.adapter.ElectionListAdapter
+import com.ytt.vmv.databinding.DialogJoinElectionBinding
 import com.ytt.vmv.databinding.FragmentMainBinding
 import com.ytt.vmv.models.ElectionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,14 +50,14 @@ class MainFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View) {
-        val editText = EditText(requireContext())
-        editText.inputType = InputType.TYPE_CLASS_TEXT
+        val dialogBinding = DialogJoinElectionBinding
+            .inflate(requireActivity().layoutInflater, null, false)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Join Election")
-            .setView(editText)
+            .setView(dialogBinding.root)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                val input = editText.text.toString().trim()
+                val input = dialogBinding.editText.text.toString().trim()
                 electionViewModel.addElection(input,
                     { showResultSnackbar(view, "Election $input added") },
                     { showResultSnackbar(view, "Error: $it") }
