@@ -13,7 +13,7 @@ class EncryptAndSignVote {
             parameters: Parameters,
             electionPublicKey: BigInteger,
             signatureKeyPair: KeyPair,
-            voteOptionNumberInGroup: BigInteger
+            voteOptionNumberInGroup: BigInteger,
         ): Pair<CipherText, EncryptProof> {
             // Encrypt and sign their plaintext vote as a vote option. We also convert the encrypted vote into a string and put it in the encrypted votes set.
             val (encryptedVote, k) = elGamalEncrypt(
@@ -50,7 +50,7 @@ class EncryptAndSignVote {
                 throw Exception("Could not verify encryption proofs")
             }
 
-            return Pair(encryptedVote, encryptProof)
+            return encryptedVote to encryptProof
 
             // Create the proof CSV file.
 //        val proofFile: File =
@@ -66,7 +66,7 @@ class EncryptAndSignVote {
         private fun elGamalEncrypt(
             parameters: Parameters,
             electionPublicKey: BigInteger,
-            data: ByteArray
+            data: ByteArray,
         ): Pair<CipherText, BigInteger> {
             val (g, p) = parameters
 
@@ -81,7 +81,8 @@ class EncryptAndSignVote {
 
             // Calculate beta as numberInGroup * h^k mod p, where h is the public key.
             val beta: BigInteger = electionPublicKey.modPow(k, p).multiply(numberInGroup).mod(p)
-            return Pair(CipherText(alpha, beta), k)
+
+            return CipherText(alpha, beta) to k
         }
 
         /**
@@ -106,7 +107,7 @@ class EncryptAndSignVote {
             cipherText: CipherText,
             signatureKeyPair: KeyPair,
             signature: ByteArray,
-            encryptionSecret: BigInteger
+            encryptionSecret: BigInteger,
         ): EncryptProof {
             val (g, p, q) = parameters
 
@@ -168,7 +169,7 @@ class EncryptAndSignVote {
          */
         private fun verifyEncryptProof(
             parameters: Parameters, cipherText: CipherText, signatureKeyPair: KeyPair,
-            encryptProof: EncryptProof
+            encryptProof: EncryptProof,
         ): Boolean {
             val (_, p, q) = parameters
 

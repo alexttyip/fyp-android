@@ -18,10 +18,10 @@
     <fragment
         android:id="@+id/voteFragment"
         android:name="com.ytt.vmv.fragments.VoteFragment"
-        android:label="{election}"
+        android:label="{electionName}"
         tools:layout="@layout/fragment_vote">
         <argument
-            android:name="election"
+            android:name="electionName"
             app:argType="string" />
     </fragment>
     <fragment

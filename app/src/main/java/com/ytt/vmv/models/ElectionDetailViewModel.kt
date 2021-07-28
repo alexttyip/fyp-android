@@ -49,6 +49,11 @@ class ElectionDetailViewModel @Inject constructor(
 
     fun getUserParam() {
         election.value?.let {
+            if (it.hasObtainedUserParams()) {
+                _userParamNav.value = Event(it.getUserParamDest())
+                return
+            }
+
             val param = JSONObject()
                 .put("electionName", it.name)
                 .put("deviceId", it.deviceId)
