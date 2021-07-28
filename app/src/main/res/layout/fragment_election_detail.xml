@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:enabled="@{viewModel.election.hasGeneratedKeyPairs()}"
                 android:onClick="@{() -> onClickUserParam.click(viewModel.election.name)}"
-                android:text="Get User Params"
+                android:text="@{viewModel.election.hasObtainedUserParams() ? `View User Params` : `Get User Params`}"
                 app:layout_constraintBottom_toTopOf="@+id/btn_vote"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

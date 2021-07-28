@@ -9,6 +9,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.ytt.vmv.Event
 import com.ytt.vmv.database.Election
+import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
 import com.ytt.vmv.fragments.ElectionDetailFragmentDirections
 import com.ytt.vmv.network.NetworkSingleton
@@ -82,14 +83,24 @@ class ElectionDetailViewModel @Inject constructor(
 
         val respBeta = BigInteger(response.getString("beta"))
         val respETNIG = response.getString("encryptedTrackerNumberInGroup")
+        val voteOptions = response.getJSONArray("voteOptions")
+
+        val electionOptions = (0 until voteOptions.length()).map { i ->
+            voteOptions.getJSONObject(i).let {
+                ElectionOption(
+                    it.getString("option"),
+                    BigInteger(it.getString("optionNumberInGroup")),
+                    electionName
+                )
+            }
+        }
 
         election.value?.apply {
             beta = respBeta
             encryptedTrackerNumberInGroup = respETNIG
 
-            viewModelScope.launch {
-                repository.update(this@apply)
-            }
+            viewModelScope.launch { repository.update(this@apply) }
+            viewModelScope.launch { repository.insertAll(electionOptions) }
 
             _userParamNav.value = Event(getUserParamDest())
         }
@@ -98,10 +109,16 @@ class ElectionDetailViewModel @Inject constructor(
     override fun onErrorResponse(error: VolleyError?) {
         error ?: return
 
-        val resp = JSONObject(String(error.networkResponse.data))
-        Log.e("Resp", resp.toString())
+        val code = try {
+            val resp = JSONObject(String(error.networkResponse.data))
+            Log.e("Resp", resp.toString())
 
-        val errorMsg = when (resp.getString("code")) {
+            resp.getString("code")
+        } catch (e: Exception) {
+            error.networkResponse.data
+        }
+
+        val errorMsg = when (code) {
             UserParamErrors.ELECTION_NOT_STARTED.name -> "Election hasn't started."
             else -> "Server error."
         }
@@ -110,7 +127,7 @@ class ElectionDetailViewModel @Inject constructor(
     }
 
     companion object {
-        private const val USER_PARAM_URL = "https://snapfile.tech/voter/getVoterParams"
+        private const val USER_PARAM_URL = "https://snapfile.tech/voter/getVoterParamsAndOptions"
 
         enum class UserParamErrors {
             ELECTION_NOT_STARTED,

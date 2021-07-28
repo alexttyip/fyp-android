@@ -22,6 +22,9 @@ interface ElectionDao {
     @Insert
     suspend fun insert(electionOption: ElectionOption)
 
+    @Insert
+    suspend fun insertAll(electionOptions: List<ElectionOption>)
+
     @Update
     suspend fun update(election: Election)
 

@@ -28,6 +28,11 @@ class ElectionRepository @Inject constructor(
     }
 
     @WorkerThread
+    suspend fun insertAll(electionOptions: List<ElectionOption>) {
+        electionDao.insertAll(electionOptions)
+    }
+
+    @WorkerThread
     suspend fun update(election: Election) {
         electionDao.update(election)
     }
