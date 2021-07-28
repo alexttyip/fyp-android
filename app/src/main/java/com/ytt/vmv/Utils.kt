@@ -39,17 +39,20 @@ class CircleTransform : Transformation {
     }
 }
 
-fun showParamDialog(context: Context, paramName: String, param: BigInteger) {
+fun showParamDialog(context: Context, paramName: String, param: BigInteger) =
+    showParamDialog(context, paramName, param.toString())
+
+fun showParamDialog(context: Context, paramName: String, param: String) {
     AlertDialog.Builder(context)
         .setTitle("Content of $paramName")
-        .setMessage(param.toString())
+        .setMessage(param)
         .setNeutralButton(
             "Copy to Clipboard"
         ) { _, _ ->
             val clipboard =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-            val clip = ClipData.newPlainText(paramName, param.toString())
+            val clip = ClipData.newPlainText(paramName, param)
 
             clipboard.setPrimaryClip(clip)
 

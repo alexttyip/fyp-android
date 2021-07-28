@@ -11,5 +11,5 @@ class UserParamViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val beta = BigInteger(savedStateHandle.get<String>("beta") ?: "0")
-    val encryptedTNIG = BigInteger(savedStateHandle.get<String>("encryptedTNIG") ?: "0")
+    val encryptedTNIG = savedStateHandle.get<String>("encryptedTNIG") ?: ""
 }

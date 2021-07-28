@@ -7,6 +7,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.ytt.vmv.Event
 import com.ytt.vmv.cryptography.VoterKeyGenerator
+import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionRepository
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,10 +22,7 @@ class GenerateKeyViewModel @Inject constructor(
     private val network: NetworkSingleton,
     application: Application,
 ) : AndroidViewModel(application), Response.ErrorListener, Response.Listener<String> {
-    private val electionName: String =
-        savedStateHandle.get<String>("election") ?: ""
-
-    val election = repository.getOnlyElectionByName(electionName).asLiveData()
+    val election = savedStateHandle.get<Election>("election")
 
     val isOverlayVisible = MutableLiveData(false)
     private val _uploadResp = MutableLiveData<Event<String>>()
@@ -36,7 +34,7 @@ class GenerateKeyViewModel @Inject constructor(
         get() = _uploadError
 
     fun onGenKeys() {
-        election.value?.apply {
+        election?.apply {
             isOverlayVisible.value = true
 
             val applicationContext = getApplication<Application>().applicationContext

@@ -22,7 +22,7 @@ data class Election(
     var publicKeySignature: BigInteger? = null,
     var publicKeyTrapdoor: BigInteger? = null,
     var beta: BigInteger? = null,
-    var encryptedTrackerNumberInGroup: BigInteger? = null,
+    var encryptedTrackerNumberInGroup: String? = null,
     val deviceId: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     fun hasGeneratedKeyPairs() =

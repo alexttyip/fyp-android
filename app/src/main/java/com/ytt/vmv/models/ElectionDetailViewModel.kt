@@ -24,8 +24,8 @@ class ElectionDetailViewModel @Inject constructor(
     private val repository: ElectionRepository,
     private val network: NetworkSingleton,
 ) : ViewModel(), Response.Listener<JSONObject>, Response.ErrorListener {
-    private val electionName: String =
-        savedStateHandle.get<String>("election") ?: ""
+    private val electionName =
+        savedStateHandle.get<String>("electionName") ?: ""
 
     val election = repository.getOnlyElectionByName(electionName).asLiveData()
 
@@ -40,10 +40,10 @@ class ElectionDetailViewModel @Inject constructor(
     fun getViewKeysDest() = election.value?.let {
         if (it.hasGeneratedKeyPairs())
             ElectionDetailFragmentDirections
-                .actionElectionDetailFragmentToViewKeyFragment(it.name)
+                .actionElectionDetailFragmentToViewKeyFragment(it.name, it)
         else
             ElectionDetailFragmentDirections
-                .actionElectionDetailFragmentToGenerateKeyFragment(it.name)
+                .actionElectionDetailFragmentToGenerateKeyFragment(it.name, it)
     }
 
     fun getUserParam() {
@@ -81,8 +81,7 @@ class ElectionDetailViewModel @Inject constructor(
         response ?: return
 
         val respBeta = BigInteger(response.getString("beta"))
-        val respETNIG =
-            BigInteger(response.getString("encryptedTrackerNumberInGroup"))
+        val respETNIG = response.getString("encryptedTrackerNumberInGroup")
 
         election.value?.apply {
             beta = respBeta

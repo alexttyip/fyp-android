@@ -5,15 +5,11 @@
 
         <import type="android.view.View" />
 
-        <import type="com.ytt.vmv.database.Election" />
+        <import type="com.ytt.vmv.UtilsKt" />
 
         <variable
             name="viewModel"
             type="com.ytt.vmv.models.GenerateKeyViewModel" />
-
-        <variable
-            name="paramDialogCallback"
-            type="com.ytt.vmv.interfaces.OnClickParam" />
     </data>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -30,7 +26,7 @@
                 android:id="@+id/btn_g"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> paramDialogCallback.click(`param g`, viewModel.election.g)}"
+                android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `param g`, viewModel.election.g)}"
                 android:text="View g parameter"
                 app:layout_constraintBottom_toTopOf="@+id/btn_p"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +37,7 @@
                 android:id="@+id/btn_p"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> paramDialogCallback.click(`param p`, viewModel.election.p)}"
+                android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `param p`, viewModel.election.p)}"
                 android:text="View p parameter"
                 app:layout_constraintBottom_toTopOf="@+id/btn_q"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +48,7 @@
                 android:id="@+id/btn_q"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> paramDialogCallback.click(`param q`, viewModel.election.q)}"
+                android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `param q`, viewModel.election.q)}"
                 android:text="View q parameter"
                 app:layout_constraintBottom_toTopOf="@+id/btn_gen_key"
                 app:layout_constraintEnd_toEndOf="parent"

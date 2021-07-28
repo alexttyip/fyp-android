@@ -3,13 +3,11 @@
 
     <data>
 
+        <import type="com.ytt.vmv.UtilsKt" />
+
         <variable
             name="viewModel"
             type="com.ytt.vmv.models.UserParamViewModel" />
-
-        <variable
-            name="onParamClick"
-            type="com.ytt.vmv.interfaces.OnClickParam" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,7 +21,7 @@
             android:id="@+id/btn_beta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{()-> onParamClick.click(`beta`, viewModel.beta)}"
+            android:onClick="@{(v)-> UtilsKt.showParamDialog(v.context, `beta`, viewModel.beta)}"
             android:text="Beta value"
             app:layout_constraintBottom_toTopOf="@+id/btn_encrypted_tnig"
             app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +33,7 @@
             android:id="@+id/btn_encrypted_tnig"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{()-> onParamClick.click(`encrypted tracker number in group`, viewModel.encryptedTNIG)}"
+            android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `encrypted tracker number in group`, viewModel.encryptedTNIG)}"
             android:text="Encrypted Tracker Number In Group"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -27,10 +27,10 @@
     <fragment
         android:id="@+id/electionDetailFragment"
         android:name="com.ytt.vmv.fragments.ElectionDetailFragment"
-        android:label="{election}"
+        android:label="{electionName}"
         tools:layout="@layout/fragment_election_detail">
         <argument
-            android:name="election"
+            android:name="electionName"
             app:argType="string" />
         <action
             android:id="@+id/action_electionDetailFragment_to_generateKeyFragment"
@@ -48,28 +48,34 @@
     <fragment
         android:id="@+id/generateKeyFragment"
         android:name="com.ytt.vmv.fragments.GenerateKeyFragment"
-        android:label="{election}"
+        android:label="{label}"
         tools:layout="@layout/fragment_generate_key">
         <argument
-            android:name="election"
+            android:name="label"
             app:argType="string" />
+        <argument
+            android:name="election"
+            app:argType="com.ytt.vmv.database.Election" />
     </fragment>
     <fragment
         android:id="@+id/viewKeyFragment"
         android:name="com.ytt.vmv.fragments.ViewKeyFragment"
-        android:label="{election}"
+        android:label="{label}"
         tools:layout="@layout/fragment_view_key">
         <argument
-            android:name="election"
+            android:name="label"
             app:argType="string" />
+        <argument
+            android:name="election"
+            app:argType="com.ytt.vmv.database.Election" />
     </fragment>
     <fragment
         android:id="@+id/userParamFragment"
         android:name="com.ytt.vmv.fragments.UserParamFragment"
-        android:label="{election}"
+        android:label="{label}"
         tools:layout="@layout/fragment_user_param">
         <argument
-            android:name="election"
+            android:name="label"
             app:argType="string" />
         <argument
             android:name="beta"

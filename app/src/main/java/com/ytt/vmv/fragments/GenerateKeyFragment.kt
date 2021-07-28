@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.databinding.FragmentGenerateKeyBinding
 import com.ytt.vmv.models.GenerateKeyViewModel
-import com.ytt.vmv.showParamDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,10 +47,6 @@ class GenerateKeyFragment : Fragment() {
                             Snackbar.LENGTH_LONG
                         ).show()
                     }
-                }
-
-                setParamDialogCallback { paramName, value ->
-                    showParamDialog(requireContext(), paramName, value)
                 }
             }.root
     }

@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ytt.vmv.databinding.FragmentViewKeyBinding
 import com.ytt.vmv.models.ViewKeyViewModel
-import com.ytt.vmv.showParamDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,10 +23,6 @@ class ViewKeyFragment : Fragment() {
             .apply {
                 lifecycleOwner = this@ViewKeyFragment
                 viewModel = viewKeyViewModel
-
-                setParamDialogCallback { paramName, value ->
-                    showParamDialog(requireContext(), paramName, value)
-                }
             }.root
     }
 }
