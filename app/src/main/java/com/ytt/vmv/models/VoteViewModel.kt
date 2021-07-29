@@ -2,6 +2,7 @@ package com.ytt.vmv.models
 
 import android.content.Context
 import android.content.DialogInterface
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.*
 import com.android.volley.toolbox.StringRequest
@@ -9,9 +10,11 @@ import com.ytt.vmv.Event
 import com.ytt.vmv.cryptography.*
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionRepository
+import com.ytt.vmv.fragments.VoteFragmentDirections
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.json.JSONObject
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -26,7 +29,7 @@ class VoteViewModel @Inject constructor(
 
     val electionWithOptions = repository.getByName(electionName).asLiveData()
 
-    val privateKeySignature by lazy {
+    private val privateKeySignature by lazy {
         VoterKeyGenerator.getPrivateKey(
             applicationContext, electionName,
             VoterKeyGenerator.PrivateKey.SIGNATURE_PRIVATE_KEY
@@ -53,33 +56,35 @@ class VoteViewModel @Inject constructor(
             val selected = options[selectedIdx]
 
             DialogInterface.OnClickListener { _, _ ->
-                // TODO use result
                 val (cipherText, proof) = encryptVote(election, selected.optionNumberInGroup)
+
+                val bodyObj = JSONObject()
+                    .put("electionName", electionName)
+                    .put("beta", election.beta.toString())
+                    .put("encryptedVote", cipherText.toByteArray().toBase64())
+                    .put("encryptedVoteSignature", proof.encryptedVoteSignature.toBase64())
+                    .put("encryptProof", proof.toJSONObject())
 
                 val req = object : StringRequest(Method.POST, VOTE_URL, { response ->
                     Log.e("Response", response)
 
                     _snackbarMsg.value = Event("OK" to "You voted for ${selected.option}.")
                 }, { error ->
-                    Log.e("Error", error.toString())
+                    Log.e("Error", String(error.networkResponse.data))
 
                     _snackbarMsg.value = Event("Error" to "Server error.")
                 }) {
-                    override fun getParams(): MutableMap<String, String> {
-                        val map = HashMap<String, String>()
+                    override fun getBody() = bodyObj.toString().toByteArray()
 
-                        // TODO Add parameters
-//                        map["vote"] = name
-
-                        return map
-                    }
+                    override fun getBodyContentType() = "application/json; charset=utf-8"
                 }
 
                 network.addToRequestQueue(req)
             }
-
         }
     }
+
+    val voteDest = VoteFragmentDirections.actionVoteFragmentToMainFragment()
 
     private fun encryptVote(
         election: Election,
@@ -95,6 +100,14 @@ class VoteViewModel @Inject constructor(
             optionNumberInGroup
         )
     }
+
+    private fun ByteArray.toBase64() = Base64.encodeToString(this, Base64.NO_WRAP)
+
+    private fun EncryptProof.toJSONObject() = JSONObject()
+        .put("c1R", c1R.toString())
+        .put("c2R", c2R.toString())
+        .put("c1Bar", c1Bar.toString())
+        .put("c2Bar", c2Bar.toString())
 
     companion object {
         const val VOTE_URL = "https://snapfile.tech/voter/vote"

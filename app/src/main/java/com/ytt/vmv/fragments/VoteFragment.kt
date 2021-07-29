@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ytt.vmv.adapter.OptionListAdapter
 import com.ytt.vmv.databinding.FragmentVoteBinding
@@ -22,9 +23,11 @@ class VoteFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = FragmentVoteBinding.inflate(inflater, container, false).apply {
+        return FragmentVoteBinding.inflate(inflater, container, false).apply {
             val optionListAdapter = OptionListAdapter()
             recycler.adapter = optionListAdapter
+
+            subscribeUi(optionListAdapter)
 
             fab.setOnClickListener {
                 val selectedIdx = optionListAdapter.selectedItem
@@ -40,20 +43,18 @@ class VoteFragment : Fragment() {
                 }
             }
 
-            subscribeUi(optionListAdapter)
-        }
+            voteViewModel.snackbarMsg.observe(viewLifecycleOwner) { event ->
+                val (code, msg) = event.getContentIfNotHandled() ?: return@observe
 
-        voteViewModel.snackbarMsg.observe(viewLifecycleOwner) { event ->
-            val (code, msg) = event.getContentIfNotHandled() ?: return@observe
+                Snackbar.make(root, msg, Snackbar.LENGTH_LONG).show()
 
-            Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
-
-            if (code == "OK") {
-                TODO("navigate away")
+                if (code == "OK") {
+                    findNavController().navigate(
+                        voteViewModel.voteDest
+                    )
+                }
             }
-        }
-
-        return binding.root
+        }.root
     }
 
     private fun subscribeUi(adapter: OptionListAdapter) {

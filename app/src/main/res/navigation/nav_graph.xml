@@ -23,6 +23,9 @@
         <argument
             android:name="electionName"
             app:argType="string" />
+        <action
+            android:id="@+id/action_voteFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
     <fragment
         android:id="@+id/electionDetailFragment"

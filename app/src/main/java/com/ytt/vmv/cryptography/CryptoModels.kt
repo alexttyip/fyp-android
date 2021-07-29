@@ -16,7 +16,7 @@ data class PublicKeys(
 data class Parameters(
     val g: BigInteger, // generator
     val p: BigInteger, // prime
-    val q: BigInteger // prime factor of p-1
+    val q: BigInteger, // prime factor of p-1
 ) : Parcelable
 
 data class KeyPair(
@@ -29,12 +29,12 @@ class EncryptProof(
     val c2R: BigInteger,
     val c1Bar: BigInteger,
     val c2Bar: BigInteger,
-    val encryptedVoteSignature: ByteArray
+    val encryptedVoteSignature: ByteArray,
 )
 
 data class CipherText(
     val alpha: BigInteger,
-    val beta: BigInteger
+    val beta: BigInteger,
 ) {
     fun toByteArray(): ByteArray {
         return try {
