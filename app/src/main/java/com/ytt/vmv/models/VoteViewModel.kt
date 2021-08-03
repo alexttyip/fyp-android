@@ -14,6 +14,7 @@ import com.ytt.vmv.fragments.VoteFragmentDirections
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.math.BigInteger
 import javax.inject.Inject
@@ -21,8 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class VoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    repository: ElectionRepository,
-    val network: NetworkSingleton,
+    private val repository: ElectionRepository,
+    private val network: NetworkSingleton,
     @ApplicationContext applicationContext: Context,
 ) : ViewModel() {
     val electionName = savedStateHandle.get<String>("electionName") ?: ""
@@ -68,11 +69,19 @@ class VoteViewModel @Inject constructor(
                 val req = object : StringRequest(Method.POST, VOTE_URL, { response ->
                     Log.e("Response", response)
 
+                    // Save that user has voted
+                    viewModelScope.launch { repository.update(election.apply { hasVoted = true }) }
+
                     _snackbarMsg.value = Event("OK" to "You voted for ${selected.option}.")
                 }, { error ->
-                    Log.e("Error", String(error.networkResponse.data))
+                    _snackbarMsg.value = if (error.networkResponse == null) {
+                        // No internet connection.
+                        Event("Error" to "No internet connection.")
+                    } else {
+                        Log.e("Error", String(error.networkResponse.data))
 
-                    _snackbarMsg.value = Event("Error" to "Server error.")
+                        Event("Error" to "Server error.")
+                    }
                 }) {
                     override fun getBody() = bodyObj.toString().toByteArray()
 

@@ -53,3 +53,9 @@ data class CipherText(
     }
 }
 
+data class TrackerNumber(
+    val trackerNumber: Int,
+    val trackerNumberInGroup: BigInteger,
+    val encryptedTrackerNumberInGroup: String,
+)
+//{ fun toByteArray() = ByteBuffer.allocate(Integer.BYTES).putInt(trackerNumber).array() }

@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:enabled="@{viewModel.election.hasObtainedUserParams()}"
                 android:onClick="@{() -> onClickVote.click(viewModel.election.name)}"
-                android:text="Vote"
+                android:text="@{viewModel.election.hasVoted ? `Verify Vote` : `Vote`}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

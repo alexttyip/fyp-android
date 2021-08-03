@@ -6,14 +6,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ElectionDao {
-    @Query("SELECT * FROM election")
+    @Query("SELECT * FROM Election")
     fun getAll(): Flow<List<Election>>
 
     @Transaction
-    @Query("SELECT * FROM election WHERE name = :name")
+    @Query("SELECT * FROM Election WHERE name = :name")
     fun getElectionAndOptionsByName(name: String): Flow<ElectionAndOptions>
 
-    @Query("SELECT * FROM election WHERE name = :name")
+    @Query("SELECT * FROM Election WHERE name = :name")
     fun getElectionByName(name: String): Flow<Election>
 
     @Insert
@@ -31,8 +31,17 @@ interface ElectionDao {
     @Delete
     suspend fun delete(election: Election)
 
-    @Query("DELETE FROM election")
-    suspend fun deleteAll()
+    @Transaction
+    suspend fun deleteAll() {
+        deleteAllElections()
+        deleteAllOptions()
+    }
+
+    @Query("DELETE FROM Election")
+    suspend fun deleteAllElections()
+
+    @Query("DELETE FROM ElectionOption")
+    suspend fun deleteAllOptions()
 
     @Query("SELECT COUNT(name) FROM election")
     suspend fun count(): Int

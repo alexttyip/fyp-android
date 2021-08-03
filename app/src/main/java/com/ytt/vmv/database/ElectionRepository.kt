@@ -38,6 +38,11 @@ class ElectionRepository @Inject constructor(
     }
 
     @WorkerThread
+    suspend fun deleteAll() {
+        electionDao.deleteAll()
+    }
+
+    @WorkerThread
     suspend fun updateFromRemote() {
         delay(5000L)
         println("Wait is over")

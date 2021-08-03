@@ -23,13 +23,15 @@ data class Election(
     var publicKeyTrapdoor: BigInteger? = null,
     var beta: BigInteger? = null,
     var encryptedTrackerNumberInGroup: String? = null,
+    var hasVoted: Boolean = false,
+    var alpha: BigInteger? = null,
     val deviceId: String = UUID.randomUUID().toString(),
 ) : Parcelable {
     fun hasGeneratedKeyPairs() =
-        publicKeySignature != null && publicKeyTrapdoor != null
+        hasVoted || (publicKeySignature != null && publicKeyTrapdoor != null)
 
     fun hasObtainedUserParams() =
-        hasGeneratedKeyPairs() && beta != null && encryptedTrackerNumberInGroup != null
+        hasVoted || (hasGeneratedKeyPairs() && beta != null && encryptedTrackerNumberInGroup != null)
 }
 
 @Parcelize
@@ -53,3 +55,10 @@ data class ElectionAndOptions(
 ) : Parcelable {
     fun hasElectionStarted() = options.isNotEmpty()
 }
+
+@Entity
+data class ElectionTrackerNumber(
+    val encryptedTrackerNumberInGroup: String,
+    val trackerNumber: String,
+    val trackerNumberInGroup: String,
+)

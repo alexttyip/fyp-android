@@ -53,11 +53,22 @@ class ElectionViewModel @Inject constructor(
             },
             { error ->
                 Log.e("Error", error.toString())
+
+                // No internet connection.
+                if (error.networkResponse == null) {
+                    errorCallback("No internet connection.")
+                    return@JsonObjectRequest
+                }
+
                 errorCallback(error.toString())
             }
         )
 
         network.addToRequestQueue(req)
+    }
+
+    fun clearAll() = viewModelScope.launch {
+        repository.deleteAll()
     }
 
     private fun saveElectionParams(name: String, params: JSONObject) {

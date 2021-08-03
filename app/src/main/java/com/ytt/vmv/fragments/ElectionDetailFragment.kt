@@ -37,12 +37,16 @@ class ElectionDetailFragment : Fragment() {
                 }
 
                 onClickVote = OnClickVote {
-                    electionDetailViewModel.getVoteDest()?.let { findNavController().navigate(it) }
+                    electionDetailViewModel.vote()
                 }
             }
 
         with(electionDetailViewModel) {
             userParamNav.observe(viewLifecycleOwner) { event ->
+                event.getContentIfNotHandled()?.let { findNavController().navigate(it) }
+            }
+
+            voteNav.observe(viewLifecycleOwner) { event ->
                 event.getContentIfNotHandled()?.let { findNavController().navigate(it) }
             }
 

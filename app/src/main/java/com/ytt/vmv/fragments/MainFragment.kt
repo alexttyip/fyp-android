@@ -1,15 +1,14 @@
 package com.ytt.vmv.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.ytt.vmv.R
 import com.ytt.vmv.adapter.ElectionListAdapter
 import com.ytt.vmv.databinding.DialogJoinElectionBinding
 import com.ytt.vmv.databinding.FragmentMainBinding
@@ -25,6 +24,8 @@ class MainFragment : Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        setHasOptionsMenu(true)
+
         return FragmentMainBinding.inflate(inflater, container, false)
             .apply {
                 val adapter = ElectionListAdapter()
@@ -66,6 +67,25 @@ class MainFragment : Fragment(), View.OnClickListener {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.hello -> {
+            electionViewModel.addElection("hello",
+                { showResultSnackbar(requireView(), "Election hello added") },
+                { showResultSnackbar(requireView(), "Error: $it") }
+            )
+            true
+        }
+        R.id.clear -> {
+            electionViewModel.clearAll()
+            true
+        }
+        else -> false
     }
 
     private fun showResultSnackbar(view: View, text: String) {

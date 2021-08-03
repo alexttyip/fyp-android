@@ -39,11 +39,11 @@ class GenerateKeyFragment : Fragment() {
                     }
 
                     it.uploadError.observe(viewLifecycleOwner) { event ->
-                        !event.hasBeenHandled || return@observe
+                        val error = event.getContentIfNotHandled() ?: return@observe
 
                         Snackbar.make(
                             container!!,
-                            "Server error",
+                            error,
                             Snackbar.LENGTH_LONG
                         ).show()
                     }

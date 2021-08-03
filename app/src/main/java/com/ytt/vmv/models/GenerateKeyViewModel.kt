@@ -26,11 +26,11 @@ class GenerateKeyViewModel @Inject constructor(
 
     val isOverlayVisible = MutableLiveData(false)
     private val _uploadResp = MutableLiveData<Event<String>>()
-    private val _uploadError = MutableLiveData<Event<VolleyError>>()
+    private val _uploadError = MutableLiveData<Event<String>>()
 
     val uploadResp: LiveData<Event<String>>
         get() = _uploadResp
-    val uploadError: LiveData<Event<VolleyError>>
+    val uploadError: LiveData<Event<String>>
         get() = _uploadError
 
     fun onGenKeys() {
@@ -82,7 +82,13 @@ class GenerateKeyViewModel @Inject constructor(
 
     override fun onErrorResponse(error: VolleyError) {
         isOverlayVisible.value = false
-        _uploadError.value = Event(error)
+
+        if (error.networkResponse == null) {
+            _uploadError.value = Event("No internet connection.")
+            return
+        }
+
+        _uploadError.value = Event("Server error.")
     }
 
     companion object {

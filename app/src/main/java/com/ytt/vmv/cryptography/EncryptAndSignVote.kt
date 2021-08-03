@@ -61,43 +61,6 @@ class EncryptAndSignVote {
         }
 
         /**
-         * Encrypts the plaintext [data] using the [parameters] and [electionPublicKey].
-         */
-        private fun elGamalEncrypt(
-            parameters: Parameters,
-            electionPublicKey: BigInteger,
-            data: ByteArray,
-        ): Pair<CipherText, BigInteger> {
-            val (g, p) = parameters
-
-            // Convert the data into a number that should be within the group G of the parameters.
-            val numberInGroup = BigInteger(1, data)
-
-            // Generate a random number in the range 1 to p-1.
-            val k: BigInteger = generateRandom(p)
-
-            // Calculate alpha as g^k mod p.
-            val alpha = g.modPow(k, p)
-
-            // Calculate beta as numberInGroup * h^k mod p, where h is the public key.
-            val beta: BigInteger = electionPublicKey.modPow(k, p).multiply(numberInGroup).mod(p)
-
-            return CipherText(alpha, beta) to k
-        }
-
-        /**
-         * Generate a random number in the range 1 to [limit]-1.
-         */
-        private fun generateRandom(limit: BigInteger): BigInteger {
-            val limitBitLength = limit.bitLength()
-            var value = BigInteger(limitBitLength, SecureRandom())
-            while (value == BigInteger.ZERO || value > limit.subtract(BigInteger.valueOf(2))) {
-                value = BigInteger(limitBitLength, SecureRandom())
-            }
-            return value
-        }
-
-        /**
          * Creates the non-interactive zero-knowledge proofs of knowledge of an ElGamal encryption.
          */
         private fun createEncryptProof(
