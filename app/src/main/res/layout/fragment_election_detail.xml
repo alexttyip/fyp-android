@@ -100,7 +100,7 @@
 
             <Button
                 android:id="@+id/btn_vote"
-                android:layout_width="379dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:enabled="@{viewModel.election.hasObtainedUserParams()}"
                 android:onClick="@{() -> onClickVote.click(viewModel.election.name)}"

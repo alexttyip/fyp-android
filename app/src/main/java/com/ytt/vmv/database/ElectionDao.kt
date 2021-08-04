@@ -16,6 +16,9 @@ interface ElectionDao {
     @Query("SELECT * FROM Election WHERE name = :name")
     fun getElectionByName(name: String): Flow<Election>
 
+    @Query("SELECT * FROM ElectionTrackerNumber WHERE electionName  = :name")
+    suspend fun getTNs(name: String): List<ElectionTrackerNumber>
+
     @Insert
     suspend fun insert(election: Election)
 
@@ -23,7 +26,10 @@ interface ElectionDao {
     suspend fun insert(electionOption: ElectionOption)
 
     @Insert
-    suspend fun insertAll(electionOptions: List<ElectionOption>)
+    suspend fun insertAllOptions(electionOptions: List<ElectionOption>)
+
+    @Insert
+    suspend fun insertAllTNs(trackerNumber: List<ElectionTrackerNumber>)
 
     @Update
     suspend fun update(election: Election)
@@ -35,6 +41,7 @@ interface ElectionDao {
     suspend fun deleteAll() {
         deleteAllElections()
         deleteAllOptions()
+        deleteAllTNs()
     }
 
     @Query("DELETE FROM Election")
@@ -42,6 +49,9 @@ interface ElectionDao {
 
     @Query("DELETE FROM ElectionOption")
     suspend fun deleteAllOptions()
+
+    @Query("DELETE FROM ElectionTrackerNumber")
+    suspend fun deleteAllTNs()
 
     @Query("SELECT COUNT(name) FROM election")
     suspend fun count(): Int

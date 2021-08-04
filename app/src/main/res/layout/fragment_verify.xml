@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.VerifyFragment">
+
+    <data>
+
+        <import type="com.ytt.vmv.UtilsKt" />
+
+        <variable
+            name="viewModel"
+            type="com.ytt.vmv.models.VerifyViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="16dp">
+
+        <Button
+            android:id="@+id/btn_alpha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `alpha`, viewModel.election.alpha)}"
+            android:text="View alpha"
+            app:layout_constraintBottom_toTopOf="@+id/btn_beta"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_beta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{(v) -> UtilsKt.showParamDialog(v.context, `beta`, viewModel.election.beta)}"
+            android:text="View beta"
+            app:layout_constraintBottom_toTopOf="@+id/btn_calculate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_alpha" />
+
+        <Button
+            android:id="@+id/btn_calculate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> viewModel.onClickCalculate()}"
+            android:text="Calculate Tracker Number"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_beta" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

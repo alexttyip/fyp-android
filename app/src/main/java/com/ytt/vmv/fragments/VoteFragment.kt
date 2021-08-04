@@ -49,9 +49,7 @@ class VoteFragment : Fragment() {
                 Snackbar.make(root, msg, Snackbar.LENGTH_LONG).show()
 
                 if (code == "OK") {
-                    findNavController().navigate(
-                        voteViewModel.voteDest
-                    )
+                    findNavController().navigateUp()
                 }
             }
         }.root

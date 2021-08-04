@@ -58,7 +58,19 @@ data class ElectionAndOptions(
 
 @Entity
 data class ElectionTrackerNumber(
+    val trackerNumber: BigInteger,
+    val trackerNumberInGroup: BigInteger,
     val encryptedTrackerNumberInGroup: String,
-    val trackerNumber: String,
-    val trackerNumberInGroup: String,
+    val electionName: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+)
+
+data class ElectionAndTrackerNumbers(
+    @Embedded val election: Election,
+    @Relation(
+        parentColumn = "name",
+        entityColumn = "electionName"
+    )
+    val tns: List<ElectionTrackerNumber>,
 )

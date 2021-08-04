@@ -10,7 +10,6 @@ import com.ytt.vmv.Event
 import com.ytt.vmv.cryptography.*
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionRepository
-import com.ytt.vmv.fragments.VoteFragmentDirections
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -92,8 +91,6 @@ class VoteViewModel @Inject constructor(
             }
         }
     }
-
-    val voteDest = VoteFragmentDirections.actionVoteFragmentToMainFragment()
 
     private fun encryptVote(
         election: Election,

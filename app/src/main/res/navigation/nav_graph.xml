@@ -24,8 +24,8 @@
             android:name="electionName"
             app:argType="string" />
         <action
-            android:id="@+id/action_voteFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
+            android:id="@+id/action_voteFragment_to_electionDetailFragment"
+            app:destination="@id/electionDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/electionDetailFragment"
@@ -47,6 +47,9 @@
         <action
             android:id="@+id/action_electionDetailFragment_to_userParamFragment"
             app:destination="@id/userParamFragment" />
+        <action
+            android:id="@+id/action_electionDetailFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment" />
     </fragment>
     <fragment
         android:id="@+id/generateKeyFragment"
@@ -86,5 +89,16 @@
         <argument
             android:name="encryptedTNIG"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/verifyFragment"
+        android:name="com.ytt.vmv.fragments.VerifyFragment"
+        android:label="{label}">
+        <argument
+            android:name="label"
+            app:argType="string" />
+        <argument
+            android:name="election"
+            app:argType="com.ytt.vmv.database.Election" />
     </fragment>
 </navigation>

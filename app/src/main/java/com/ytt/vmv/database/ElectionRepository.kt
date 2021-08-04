@@ -18,6 +18,9 @@ class ElectionRepository @Inject constructor(
     fun getOnlyElectionByName(name: String) = electionDao.getElectionByName(name)
 
     @WorkerThread
+    suspend fun getTrackerNumbers(electionName: String) = electionDao.getTNs(electionName)
+
+    @WorkerThread
     suspend fun insert(election: Election) {
         electionDao.insert(election)
     }
@@ -28,8 +31,13 @@ class ElectionRepository @Inject constructor(
     }
 
     @WorkerThread
-    suspend fun insertAll(electionOptions: List<ElectionOption>) {
-        electionDao.insertAll(electionOptions)
+    suspend fun insertAllOptions(electionOptions: List<ElectionOption>) {
+        electionDao.insertAllOptions(electionOptions)
+    }
+
+    @WorkerThread
+    suspend fun insertAllTNs(trackerNumbers: List<ElectionTrackerNumber>) {
+        electionDao.insertAllTNs(trackerNumbers)
     }
 
     @WorkerThread

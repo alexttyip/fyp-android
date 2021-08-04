@@ -11,6 +11,7 @@ import com.ytt.vmv.Event
 import com.ytt.vmv.database.Election
 import com.ytt.vmv.database.ElectionOption
 import com.ytt.vmv.database.ElectionRepository
+import com.ytt.vmv.database.ElectionTrackerNumber
 import com.ytt.vmv.fragments.ElectionDetailFragmentDirections
 import com.ytt.vmv.network.NetworkSingleton
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,12 +65,14 @@ class ElectionDetailViewModel @Inject constructor(
 
     fun vote() {
         election.value?.let {
-            if (it.hasVoted) {
-                TrackerNumberRequest(it)
-            } else {
-                _voteNav.value = Event(ElectionDetailFragmentDirections
-                    .actionElectionDetailFragmentToVoteFragment(it.name))
+            when {
+                it.alpha != null -> _voteNav.value = Event(it.getVerifyDest())
+                it.hasVoted -> AlphaAndTrackerNumberRequest(it)
+                else -> {
+                    _voteNav.value = Event(ElectionDetailFragmentDirections
+                        .actionElectionDetailFragmentToVoteFragment(it.name))
 
+                }
             }
         }
     }
@@ -79,6 +82,12 @@ class ElectionDetailViewModel @Inject constructor(
             name,
             beta.toString(),
             encryptedTrackerNumberInGroup.toString(),
+        )
+
+    private fun Election.getVerifyDest() = ElectionDetailFragmentDirections
+        .actionElectionDetailFragmentToVerifyFragment(
+            name,
+            this
         )
 
     inner class UserParamRequest(private val election: Election) : Response.Listener<JSONObject>,
@@ -121,7 +130,7 @@ class ElectionDetailViewModel @Inject constructor(
                 encryptedTrackerNumberInGroup = respETNIG
 
                 viewModelScope.launch { repository.update(this@apply) }
-                viewModelScope.launch { repository.insertAll(electionOptions) }
+                viewModelScope.launch { repository.insertAllOptions(electionOptions) }
 
                 _userParamNav.value = Event(getUserParamDest())
             }
@@ -152,11 +161,12 @@ class ElectionDetailViewModel @Inject constructor(
         }
     }
 
-    inner class TrackerNumberRequest(private val election: Election) :
+    inner class AlphaAndTrackerNumberRequest(private val election: Election) :
         Response.Listener<JSONObject>, Response.ErrorListener {
         init {
             val param = JSONObject()
                 .put("electionName", election.name)
+                .put("beta", election.beta.toString())
 
             val req = JsonObjectRequest(
                 Request.Method.POST,
@@ -171,26 +181,58 @@ class ElectionDetailViewModel @Inject constructor(
 
         override fun onResponse(response: JSONObject) {
             val alpha = response.getString("alpha")
+            val tnsJson = response.getJSONArray("trackerNumbers")
+
+            val tns = (0 until tnsJson.length()).map {
+                val obj = tnsJson.getJSONObject(it)
+                ElectionTrackerNumber(
+                    BigInteger(obj.getString("trackerNumber")),
+                    BigInteger(obj.getString("trackerNumberInGroup")),
+                    obj.getString("encryptedTrackerNumberInGroup"),
+                    electionName
+                )
+            }
 
             election.alpha = BigInteger(alpha)
 
             viewModelScope.launch { repository.update(election) }
+            viewModelScope.launch { repository.insertAllTNs(tns) }
 
-            // TODO nav?
+            _voteNav.value = Event(election.getVerifyDest())
         }
 
-        override fun onErrorResponse(error: VolleyError?) {
-            TODO("Not yet implemented")
+        override fun onErrorResponse(error: VolleyError) {
+            // No network connection
+            if (error.networkResponse == null) {
+                _snackBarError.value = Event("No internet connection.")
+                return
+            }
+
+            val code = try {
+                val resp = JSONObject(String(error.networkResponse.data))
+                Log.e("Resp", resp.toString())
+
+                resp.getString("code")
+            } catch (e: Exception) {
+                UserParamErrors.UNKNOWN.name
+            }
+
+            val errorMsg = when (code) {
+                UserParamErrors.ELECTION_NOT_ENDED.name -> "Election hasn't ended."
+                else -> "Server error."
+            }
+
+            _snackBarError.value = Event(errorMsg)
         }
     }
 
     companion object {
         private const val USER_PARAM_URL = "https://snapfile.tech/voter/getVoterParamsAndOptions"
-        private const val USER_ALPHA_URL = "https://snapfile.tech/voter/getAlpha"
+        private const val USER_ALPHA_URL = "https://snapfile.tech/voter/getAlphaAndTN"
 
         enum class UserParamErrors {
             ELECTION_NOT_STARTED,
-            NO_SUCH_VOTER,
+            ELECTION_NOT_ENDED,
             UNKNOWN
         }
     }
